@@ -57,6 +57,7 @@ import { PermissionRoutesService } from "./services/permission-routes.service";
     PermissionsGuard,
   ],
   exports: [
+    forwardRef(() => PermissionsModule),
     USER_SERVICE,
     SESSION_SERVICE,
     JwtModule,

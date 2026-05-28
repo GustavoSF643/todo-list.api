@@ -12,11 +12,13 @@ import request from "supertest";
 import { App } from "supertest/types";
 
 import type { JwtPayload } from "@application/auth";
+import { MODULE_SERVICE } from "@application/modules";
 import { PERMISSION_SERVICE } from "@application/permissions";
 import { SESSION_SERVICE } from "@application/sessions";
 import { USER_SERVICE } from "@application/users";
 import { IS_PUBLIC_KEY } from "@modules/auth/decorators/public.decorator";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
+import { ModulesController } from "@modules/modules/modules.controller";
 import { PermissionsGuard } from "@modules/auth/guards/permissions.guard";
 import { PermissionsController } from "@modules/permissions/permissions.controller";
 import { SessionsController } from "@modules/sessions/sessions.controller";
@@ -24,6 +26,7 @@ import { UsersController } from "@modules/users/users.controller";
 
 const PERMISSION_ID = "22222222-2222-4222-8222-222222222222";
 const USER_ID = "11111111-1111-4111-8111-111111111111";
+const MODULE_ID = "44444444-4444-4444-8444-444444444444";
 
 const reflector = new Reflector();
 
@@ -78,14 +81,27 @@ describe("App (e2e)", () => {
     update: jest.fn(),
     remove: jest.fn(),
   };
+  const moduleService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findByExternalId: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
+  };
 
   beforeAll(async () => {
     const moduleFixture = await Test.createTestingModule({
-      controllers: [UsersController, SessionsController, PermissionsController],
+      controllers: [
+        UsersController,
+        SessionsController,
+        PermissionsController,
+        ModulesController,
+      ],
       providers: [
         { provide: USER_SERVICE, useValue: userService },
         { provide: SESSION_SERVICE, useValue: sessionService },
         { provide: PERMISSION_SERVICE, useValue: permissionService },
+        { provide: MODULE_SERVICE, useValue: moduleService },
       ],
     })
       .overrideGuard(JwtAuthGuard)
@@ -275,6 +291,126 @@ describe("App (e2e)", () => {
 
     it("GET /permissions without token returns 401", () => {
       return request(app.getHttpServer()).get("/permissions").expect(401);
+    });
+  });
+
+  describe("modules", () => {
+    it("POST /modules with token creates module", async () => {
+      moduleService.create.mockResolvedValue({
+        id: "44444444-4444-4444-8444-444444444444",
+        name: "Usuários",
+        description: "Operações relacionadas ao cadastro de usuários",
+        module_key: "USERS",
+        is_active: true,
+        created_at: "2026-01-01T00:00:00.000Z",
+        updated_at: "2026-01-01T00:00:00.000Z",
+      });
+
+      const response = await request(app.getHttpServer())
+        .post("/modules")
+        .set("Authorization", "Bearer token")
+        .send({
+          name: "Usuários",
+          description: "Operações relacionadas ao cadastro de usuários",
+          module_key: "USERS",
+          is_active: true,
+        })
+        .expect(201);
+
+      expect(response.body.module_key).toBe("USERS");
+      expect(moduleService.create).toHaveBeenCalledWith({
+        name: "Usuários",
+        description: "Operações relacionadas ao cadastro de usuários",
+        module_key: "USERS",
+        is_active: true,
+      });
+    });
+
+    it("POST /modules without token returns 401", () => {
+      return request(app.getHttpServer())
+        .post("/modules")
+        .send({
+          name: "Usuários",
+          module_key: "USERS",
+        })
+        .expect(401);
+    });
+
+    it("GET /modules with token returns modules list", async () => {
+      moduleService.findAll.mockResolvedValue([
+        {
+          id: MODULE_ID,
+          name: "Usuários",
+          description: "Operações relacionadas ao cadastro de usuários",
+          module_key: "USERS",
+          is_active: true,
+          created_at: "2026-01-01T00:00:00.000Z",
+          updated_at: "2026-01-01T00:00:00.000Z",
+        },
+      ]);
+
+      const response = await request(app.getHttpServer())
+        .get("/modules")
+        .set("Authorization", "Bearer token")
+        .expect(200);
+
+      expect(response.body).toHaveLength(1);
+      expect(moduleService.findAll).toHaveBeenCalledTimes(1);
+    });
+
+    it("GET /modules/:id returns module", async () => {
+      moduleService.findByExternalId.mockResolvedValue({
+        id: MODULE_ID,
+        name: "Usuários",
+        description: "Operações relacionadas ao cadastro de usuários",
+        module_key: "USERS",
+        is_active: true,
+        created_at: "2026-01-01T00:00:00.000Z",
+        updated_at: "2026-01-01T00:00:00.000Z",
+      });
+
+      const response = await request(app.getHttpServer())
+        .get(`/modules/${MODULE_ID}`)
+        .set("Authorization", "Bearer token")
+        .expect(200);
+
+      expect(response.body.id).toBe(MODULE_ID);
+      expect(moduleService.findByExternalId).toHaveBeenCalledWith(MODULE_ID);
+    });
+
+    it("PATCH /modules/:id updates module", async () => {
+      moduleService.update.mockResolvedValue({
+        id: MODULE_ID,
+        name: "Usuários Atualizado",
+        description: "Descrição atualizada",
+        module_key: "USERS",
+        is_active: false,
+        created_at: "2026-01-01T00:00:00.000Z",
+        updated_at: "2026-01-02T00:00:00.000Z",
+      });
+
+      const response = await request(app.getHttpServer())
+        .patch(`/modules/${MODULE_ID}`)
+        .set("Authorization", "Bearer token")
+        .send({ name: "Usuários Atualizado", is_active: false })
+        .expect(200);
+
+      expect(response.body.name).toBe("Usuários Atualizado");
+      expect(moduleService.update).toHaveBeenCalledWith(MODULE_ID, {
+        name: "Usuários Atualizado",
+        is_active: false,
+      });
+    });
+
+    it("DELETE /modules/:id removes module", async () => {
+      moduleService.remove.mockResolvedValue(undefined);
+
+      await request(app.getHttpServer())
+        .delete(`/modules/${MODULE_ID}`)
+        .set("Authorization", "Bearer token")
+        .expect(200);
+
+      expect(moduleService.remove).toHaveBeenCalledWith(MODULE_ID);
     });
   });
 });

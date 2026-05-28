@@ -5,9 +5,10 @@ import { AppConfigModule } from "./config/config.module";
 import { CacheInfraModule } from "./infra/cache/cache.module";
 import { DatabaseModule } from "./infra/database/database.module";
 import { RouteSyncModule } from "./infra/route-sync/route-sync.module";
-import { PermissionsModule } from "./modules/permissions/permissions.module";
 import { SessionsModule } from "./modules/sessions/sessions.module";
+import { PermissionsModule } from "./modules/permissions/permissions.module";
 import { UsersModule } from "./modules/users/users.module";
+import { ModulesModule } from "./modules/modules/modules.module";
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { UsersModule } from "./modules/users/users.module";
     SessionsModule,
     PermissionsModule,
     UsersModule,
+    ModulesModule,
   ],
   controllers: [],
   providers: [],

@@ -1,0 +1,2 @@
+export const MODULE_REPOSITORY = Symbol("MODULE_REPOSITORY");
+export const MODULE_SERVICE = Symbol("MODULE_SERVICE");
