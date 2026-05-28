@@ -65,11 +65,25 @@ npm run format:check
 npm run test
 npm run test:e2e
 npm run test:cov
+
+# migrations
+npm run migration:generate -- <nome-da-migration>
+npm run migration:run
+npm run migration:revert
+```
+
+Exemplo:
+
+```bash
+npm run migration:generate -- initial_migration
 ```
 
 ## Estrutura do projeto
 
 ```text
+scripts/
+  generate-migration.ts
+
 src/
   config/
     app.config.ts
@@ -78,23 +92,37 @@ src/
   infra/
     database/
       database.module.ts
+      enums/
+        route-method.enum.ts
+        index.ts
       typeorm/
         typeorm.config.ts
+        data-source.ts
       entities/
       migrations/
   app.module.ts
   main.ts
 ```
 
+## Documentacao
+
+- Guia de documentacao: `docs/README.md`
+- Diagrama de arquitetura: `docs/diagrams/architecture.md`
+- Diagrama PostgreSQL (ERD): `docs/diagrams/postgres-erd.md`
+
 ## Diretrizes de arquitetura
 
 - `config/`: centraliza leitura/validação de variáveis e exposição tipada via `AppConfigService`.
 - `infra/database/`: encapsula integração com TypeORM e evolução de schema (migrations).
+- `scripts/`: automações de linha de comando para tarefas operacionais do projeto.
+- `infra/database/entities/`: mapeia tabelas principais (`module`, `route`, `permission`, `user`) e tabelas de associação (`module_route`, `permission_module`).
+- `infra/database/enums/`: concentra enums reutilizáveis usados no mapeamento de entidades.
+- `infra/database/typeorm/data-source.ts`: configuração específica para o TypeORM CLI (geração/execução de migrations).
 - `app.module.ts`: composição dos módulos de aplicação.
 
 ## Roadmap inicial
 
-- adicionar primeiras entidades e migrations reais
+- adicionar migrations para consolidar o schema atual
 - incluir CI para `lint`, `build` e `test`
 - adicionar documentação de endpoints (Swagger)
 
