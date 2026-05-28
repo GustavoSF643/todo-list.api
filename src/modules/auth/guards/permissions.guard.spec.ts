@@ -6,6 +6,10 @@ import { Reflector } from "@nestjs/core";
 import { Test, TestingModule } from "@nestjs/testing";
 import type { Request } from "express";
 
+import {
+  PERMISSION_REPOSITORY,
+  type PermissionRepositoryPort,
+} from "@application/permissions";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 import { PermissionRoutesService } from "../services/permission-routes.service";
 import { PermissionsGuard } from "./permissions.guard";
@@ -25,11 +29,23 @@ function createContext(
 describe("PermissionsGuard", () => {
   let guard: PermissionsGuard;
   let permissionRoutesService: { getPermissionRoutesByPermissionId: jest.Mock };
+  let permissionRepository: jest.Mocked<PermissionRepositoryPort>;
   let reflector: { getAllAndOverride: jest.Mock };
 
   beforeEach(async () => {
     permissionRoutesService = {
       getPermissionRoutesByPermissionId: jest.fn(),
+    };
+    permissionRepository = {
+      findByExternalId: jest.fn(),
+      findByName: jest.fn(),
+      findAll: jest.fn(),
+      save: jest.fn(),
+      create: jest.fn(),
+      merge: jest.fn(),
+      softDeleteByExternalId: jest.fn(),
+      existsByExternalId: jest.fn(),
+      isSuperAdmin: jest.fn().mockResolvedValue(false),
     };
     reflector = {
       getAllAndOverride: jest.fn().mockReturnValue(false),
@@ -39,6 +55,7 @@ describe("PermissionsGuard", () => {
       providers: [
         PermissionsGuard,
         { provide: PermissionRoutesService, useValue: permissionRoutesService },
+        { provide: PERMISSION_REPOSITORY, useValue: permissionRepository },
         { provide: Reflector, useValue: reflector },
       ],
     }).compile();
@@ -57,6 +74,22 @@ describe("PermissionsGuard", () => {
     expect(
       permissionRoutesService.getPermissionRoutesByPermissionId,
     ).not.toHaveBeenCalled();
+  });
+
+  it("allows super admin without checking routes", async () => {
+    permissionRepository.isSuperAdmin.mockResolvedValue(true);
+
+    const result = await guard.canActivate(
+      createContext({
+        method: "GET",
+        baseUrl: "",
+        route: { path: "/users" },
+        user: { permission_id: "perm-admin" },
+      }),
+    );
+
+    expect(result).toBe(true);
+    expect(permissionRoutesService.getPermissionRoutesByPermissionId).not.toHaveBeenCalled();
   });
 
   it("denies when user has no permission_id", async () => {

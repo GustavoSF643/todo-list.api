@@ -13,6 +13,9 @@ export class PermissionResponseDto {
   @ApiPropertyOptional({ example: true })
   is_active?: boolean;
 
+  @ApiPropertyOptional({ example: false })
+  is_super_admin?: boolean;
+
   @ApiProperty({ example: "2026-05-18T12:00:00.000Z" })
   created_at: Date;
 

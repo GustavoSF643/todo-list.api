@@ -50,4 +50,12 @@ export class TypeOrmPermissionRepository implements PermissionRepositoryPort {
     const permission = await this.findByExternalId(externalId);
     return permission !== null;
   }
+
+  async isSuperAdmin(externalId: string): Promise<boolean> {
+    const permission = await this.repository.findOne({
+      where: { external_id: externalId },
+      select: { is_super_admin: true },
+    });
+    return Boolean(permission?.is_super_admin);
+  }
 }

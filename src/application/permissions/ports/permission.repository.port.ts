@@ -12,4 +12,5 @@ export interface PermissionRepositoryPort {
   ): PermissionEntity;
   softDeleteByExternalId(externalId: string): Promise<boolean>;
   existsByExternalId(externalId: string): Promise<boolean>;
+  isSuperAdmin(externalId: string): Promise<boolean>;
 }

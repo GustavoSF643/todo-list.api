@@ -54,6 +54,7 @@ describe("UserService", () => {
       merge: jest.fn(),
       softDeleteByExternalId: jest.fn(),
       existsByExternalId: jest.fn(),
+      isSuperAdmin: jest.fn(),
     };
 
     passwordHasher = {

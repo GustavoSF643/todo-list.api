@@ -16,6 +16,9 @@ export class PermissionEntity extends BaseEntity {
   @Column({ type: "boolean", default: true, nullable: false })
   is_active?: boolean;
 
+  @Column({ type: "boolean", default: false, nullable: false })
+  is_super_admin?: boolean;
+
   @CreateDateColumn({ type: "timestamp" })
   created_at: Date;
 

@@ -2,12 +2,17 @@ import {
   CanActivate,
   ExecutionContext,
   ForbiddenException,
+  Inject,
   Injectable,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import type { Request } from "express";
 
 import type { JwtPayload } from "@application/auth";
+import {
+  PERMISSION_REPOSITORY,
+  type PermissionRepositoryPort,
+} from "@application/permissions";
 import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 import { PermissionRoutesService } from "../services/permission-routes.service";
 
@@ -23,6 +28,8 @@ function normalizePath(path: string): string {
 export class PermissionsGuard implements CanActivate {
   constructor(
     private readonly permissionRoutesService: PermissionRoutesService,
+    @Inject(PERMISSION_REPOSITORY)
+    private readonly permissionRepository: PermissionRepositoryPort,
     private readonly reflector: Reflector,
   ) {}
 
@@ -43,6 +50,14 @@ export class PermissionsGuard implements CanActivate {
 
     if (!user?.permission_id) {
       throw new ForbiddenException("Usuário sem permissões definidas.");
+    }
+
+    const isSuperAdmin = await this.permissionRepository.isSuperAdmin(
+      user.permission_id,
+    );
+
+    if (isSuperAdmin) {
+      return true;
     }
 
     const permissionRoutes =

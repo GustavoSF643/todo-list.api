@@ -18,4 +18,9 @@ export class CreatePermissionDto {
   @IsOptional()
   @IsBoolean()
   is_active?: boolean;
+
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  @IsBoolean()
+  is_super_admin?: boolean;
 }
