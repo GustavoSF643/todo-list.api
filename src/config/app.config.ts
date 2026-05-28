@@ -17,6 +17,12 @@ export const appConfig = registerAs("appConfig", () => ({
     database: process.env.POSTGRES_DATABASE,
     ssl: process.env.POSTGRES_SSL === "true",
   },
+  redis: {
+    url: (() => {
+      const url = process.env.REDIS_URL?.trim();
+      return url && url.length > 0 ? url : undefined;
+    })(),
+  },
 }));
 
 export const configs = [appConfig];

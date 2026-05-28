@@ -17,4 +17,13 @@ export const envValidationSchema = z.object({
   POSTGRES_PASSWORD: z.string(),
   POSTGRES_DATABASE: z.string(),
   POSTGRES_SSL: z.string().default("false"),
+
+  REDIS_URL: z.preprocess(
+    (val) => {
+      if (val === undefined || val === "") return undefined;
+      if (typeof val === "string" && val.trim() === "") return undefined;
+      return val;
+    },
+    z.url().optional(),
+  ),
 });

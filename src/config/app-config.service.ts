@@ -25,4 +25,8 @@ export class AppConfigService {
   get database() {
     return this.config.database;
   }
+
+  get redis() {
+    return this.config.redis;
+  }
 }

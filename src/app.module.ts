@@ -1,16 +1,14 @@
 import { Module } from "@nestjs/common";
-import { CacheModule } from "@nestjs/cache-manager";
 import { ThrottlerModule, minutes, seconds } from "@nestjs/throttler";
 
 import { AppConfigModule } from "./config/config.module";
+import { CacheInfraModule } from "./infra/cache/cache.module";
 import { DatabaseModule } from "./infra/database/database.module";
 
 @Module({
   imports: [
-    CacheModule.register({
-      isGlobal: true,
-      timeToLive: minutes(5),
-    }),
+    AppConfigModule,
+    CacheInfraModule,
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -21,7 +19,6 @@ import { DatabaseModule } from "./infra/database/database.module";
       ],
       errorMessage: "Too Many Requests",
     }),
-    AppConfigModule,
     DatabaseModule,
   ],
   controllers: [],
