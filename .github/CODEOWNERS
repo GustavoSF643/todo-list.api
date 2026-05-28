@@ -1,0 +1,12 @@
+# Default owners for the entire repository
+* @GustavoSF643
+
+# Domain-specific areas
+/src/application/ @GustavoSF643
+/src/modules/ @GustavoSF643
+/src/infra/ @GustavoSF643
+/docs/ @GustavoSF643
+/test/ @GustavoSF643
+
+# CI and repository metadata
+/.github/ @GustavoSF643
