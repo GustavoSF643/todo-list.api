@@ -3,33 +3,31 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
   UpdateDateColumn,
-} from 'typeorm';
+} from "typeorm";
+import { BaseEntity } from "./base.entity";
 
-@Entity('module')
-export class ModuleEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+@Entity("module")
+export class ModuleEntity extends BaseEntity {
 
-  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
+  @Column({ type: "varchar", length: 255, nullable: false, unique: true })
   name: string;
 
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ type: 'varchar', length: '255', unique: true })
+  @Column({ type: "varchar", length: "255", unique: true })
   module_key: string;
 
-  @Column({ type: 'boolean', default: true, nullable: false })
+  @Column({ type: "boolean", default: true, nullable: false })
   is_active?: boolean;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: "timestamp" })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: "timestamp" })
   updated_at: Date;
 
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ type: "timestamp", nullable: true })
   deleted_at?: Date;
 }

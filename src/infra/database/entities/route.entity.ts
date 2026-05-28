@@ -3,33 +3,31 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
-} from 'typeorm';
-import { RouteMethodEnum } from '../enums';
+} from "typeorm";
+import { BaseEntity } from "./base.entity";
+import { RouteMethodEnum } from "../enums";
 
-@Entity('route')
-@Unique(['method', 'path'])
-export class RouteEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+@Entity("route")
+@Unique(["method", "path"])
+export class RouteEntity extends BaseEntity {
 
-  @Column({ type: 'enum', enum: RouteMethodEnum, nullable: false })
+  @Column({ type: "enum", enum: RouteMethodEnum, nullable: false })
   method: RouteMethodEnum;
 
-  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
+  @Column({ type: "varchar", length: 255, nullable: false, unique: true })
   path: string;
 
-  @Column({ type: 'boolean', default: true, nullable: false })
+  @Column({ type: "boolean", default: true, nullable: false })
   is_active?: boolean;
 
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ type: "timestamp", nullable: true })
   deleted_at?: Date;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: "timestamp" })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: "timestamp" })
   updated_at: Date;
 }

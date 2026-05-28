@@ -9,7 +9,7 @@ if (!migrationName) {
 
 try {
   execSync(
-    `npx ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/infra/database/typeorm/data-source.ts src/infra/database/migrations/${migrationName}`,
+    `pnpm exec ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/infra/database/typeorm/data-source.ts src/infra/database/migrations/${migrationName}`,
     { stdio: "inherit" },
   );
 } catch (error) {

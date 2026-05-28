@@ -1,22 +1,27 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  UpdateDateColumn,
+} from "typeorm";
+import { BaseEntity } from "./base.entity";
 
-@Entity('permission')
-export class PermissionEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+@Entity("permission")
+export class PermissionEntity extends BaseEntity {
 
-  @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
+  @Column({ type: "varchar", length: 255, nullable: false, unique: true })
   name: string;
 
-  @Column({ type: 'boolean', default: true, nullable: false })
+  @Column({ type: "boolean", default: true, nullable: false })
   is_active?: boolean;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: "timestamp" })
   created_at: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: "timestamp" })
   updated_at: Date;
 
-  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ type: "timestamp", nullable: true })
   deleted_at?: Date;
 }

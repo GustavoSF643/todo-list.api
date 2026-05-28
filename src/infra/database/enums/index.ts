@@ -1,1 +1,1 @@
-export * from './route-method.enum';
+export * from "./route-method.enum";
