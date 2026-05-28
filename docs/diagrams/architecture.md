@@ -11,9 +11,15 @@ flowchart LR
   API --> Sessions["POST /sessions"]
   API --> Users["/users"]
   API --> Permissions["/permissions"]
+  API --> Modules["/modules"]
+  API --> ModuleRoutes["/modules/:moduleId/routes"]
+  API --> PermissionModules["/permissions/:permissionId/modules"]
   Sessions --> JWT[JWT]
   Users --> JWT
   Permissions --> JWT
+  Modules --> JWT
+  ModuleRoutes --> JWT
+  PermissionModules --> JWT
   API --> Postgres[(PostgreSQL)]
   API --> Redis[(Redis opcional)]
 ```
@@ -30,6 +36,7 @@ flowchart TD
   AppModule --> UsersModule[UsersModule]
   AppModule --> SessionsModule[SessionsModule]
   AppModule --> PermissionsModule[PermissionsModule]
+  AppModule --> ModulesModule[ModulesModule]
 
   UsersModule --> AuthModule
   SessionsModule --> AuthModule
@@ -56,6 +63,9 @@ flowchart TB
     UsersCtx[users]
     SessionsCtx[sessions]
     PermissionsCtx[permissions]
+    ModulesCtx[modules]
+    ModuleRoutesCtx[module-routes]
+    PermissionModulesCtx[permission-modules]
   end
 
   subgraph infra [infra/]
@@ -76,6 +86,9 @@ flowchart TB
 | `sessions` | `SessionService` | `POST /sessions` |
 | `users` | `UserService` | `/users` |
 | `permissions` | `PermissionService` | `/permissions` |
+| `modules` | `ModuleService` | `/modules` |
+| `module-routes` | `ModuleRoutesService` | `/modules/:moduleId/routes` |
+| `permission-modules` | `PermissionModulesService` | `/permissions/:permissionId/modules` |
 
 `AuthModule` concentra JWT, `JwtAuthGuard`, `PasswordHasher` e repositório de usuários usado no login.
 
@@ -90,3 +103,18 @@ flowchart TB
 
 - `scripts/generate-migration.ts` — wrapper para gerar migrations
 - `pnpm run start:dev` — Nest watch (SWC) + `tsc-alias` para path aliases
+
+## Modelo de autorização
+
+```mermaid
+flowchart LR
+  User[Usuário autenticado] --> Permission[permission_id no JWT]
+  Permission --> PM[permission_module]
+  PM --> Module[module]
+  Module --> MR[module_route]
+  MR --> Route[route method+path]
+  Route --> Guard[PermissionsGuard]
+```
+
+`module` representa um bloco funcional do front (página, botão, componente, seção etc).  
+Se a permissão do usuário estiver vinculada a um ou mais módulos, ele acessa todas as rotas associadas a esses módulos.

@@ -35,6 +35,7 @@ erDiagram
     UUID external_id UK
     VARCHAR name UK
     BOOLEAN is_active
+    BOOLEAN is_super_admin
     TIMESTAMP created_at
     TIMESTAMP updated_at
     TIMESTAMP deleted_at
@@ -89,7 +90,9 @@ erDiagram
 - **`route.method`:** enum `RouteMethodEnum` (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`, `HEAD`).
 - **FKs na API:** referências usam `external_id` (UUID), não o `id` serial.
 - **Usuário / 2FA:** `two_factor_secret` é gerado pelo servidor (`otplib`) quando `two_factor_is_enabled` é `true`; não é enviado nem exposto em respostas JSON.
-- **Módulos e rotas:** entities mapeadas; endpoints HTTP para `module` / `route` ainda não implementados.
+- **Módulos e autorização:** `module` representa blocos de UI (página, botão, componente, seção, etc). O acesso é resolvido por `permission_module + module_route`.
+- **Vínculos via API:** há endpoints para gerir `module_route` (`/modules/:moduleId/routes`) e `permission_module` (`/permissions/:permissionId/modules`).
+- **`permission.is_super_admin`:** quando verdadeiro, pode ser usado para bypass de autorização no guard.
 
 ## Migration inicial
 

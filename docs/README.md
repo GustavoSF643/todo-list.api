@@ -24,8 +24,18 @@ Com a aplicação rodando:
 | `users` | CRUD de usuários, senha forte, geração de secret 2FA |
 | `sessions` | Login e emissão de JWT |
 | `permissions` | CRUD de permissões |
+| `modules` | CRUD de módulos (blocos funcionais do front) |
+| `module-routes` | Vínculo entre módulo e rotas (`module_route`) |
+| `permission-modules` | Vínculo entre permissão e módulos (`permission_module`) |
 
 Cada contexto expõe DTOs, ports, services e tokens de injeção via `index.ts`.
+
+## Regra de acesso por módulos
+
+- Módulo representa um bloco de interface que pode ser restrito (página, botão, componente, seção, etc).
+- O vínculo `permission_module` define quais módulos uma permissão possui.
+- O vínculo `module_route` define quais rotas pertencem a cada módulo.
+- Usuário autenticado com uma permissão que possua módulos vinculados recebe acesso a todas as rotas desses módulos.
 
 ## Operação local
 

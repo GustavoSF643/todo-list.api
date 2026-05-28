@@ -71,6 +71,9 @@ pnpm run migration:revert
 | `sessions` | `POST /sessions` | Público (login) |
 | `users` | `/users` | JWT (exceto `POST /users`) |
 | `permissions` | `/permissions` | JWT |
+| `modules` | `/modules` | JWT |
+| `module-routes` | `/modules/:moduleId/routes` | JWT |
+| `permission-modules` | `/permissions/:permissionId/modules` | JWT |
 
 Fluxo sugerido:
 
@@ -90,6 +93,9 @@ src/
     users/               # usuários, validação de senha, 2FA
     sessions/            # login e emissão de token
     permissions/         # CRUD de permissões
+    modules/             # CRUD de módulos
+    module-routes/       # vínculo módulo ↔ rotas
+    permission-modules/  # vínculo permissão ↔ módulos
   config/                # env tipado (Zod + AppConfigService)
   infra/
     auth/                # Scrypt password hasher
@@ -100,6 +106,7 @@ src/
     users/
     sessions/
     permissions/
+    modules/
   main.ts
 ```
 
@@ -111,6 +118,25 @@ Aliases TypeScript: `@application/*`, `@config/*`, `@infra/*`, `@modules/*`.
 - Cadastro exige senha forte (`@IsSecurePassword`).
 - `two_factor_is_enabled: true` gera secret TOTP via `otplib` e persiste no banco; o secret **não** é aceito nem retornado na API.
 - Validação do código TOTP no login ainda não implementada.
+
+## Modelo de autorização por módulos
+
+- Um **módulo** representa qualquer bloco do front que possa ser bloqueado: página, botão, seção, componente, card etc.
+- O módulo é vinculado às rotas backend em `module_route`.
+- A permissão do usuário é vinculada aos módulos em `permission_module`.
+- Se o usuário tiver uma permissão com **um ou mais módulos vinculados**, ele terá acesso a **todas as rotas** associadas a esses módulos.
+- O `PermissionsGuard` resolve acesso por `method + path` com base nessa cadeia:
+
+```text
+permission -> permission_module -> module -> module_route -> route
+```
+
+### Endpoints de vínculo
+
+- `GET/PUT/POST/DELETE /modules/:moduleId/routes`
+- `GET/PUT/POST/DELETE /permissions/:permissionId/modules`
+
+Use `PUT` para sincronização completa dos vínculos e `POST` para adicionar sem remover os existentes.
 
 ## Documentação
 
