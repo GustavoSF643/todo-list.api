@@ -12,7 +12,12 @@ Security updates are provided for the following branches:
 
 Please do **not** open public GitHub issues for security vulnerabilities.
 
-Instead, report privately to the maintainers with:
+Instead, report privately to:
+
+- **Email:** gustavosilvafranco643@gmail.com
+- **GitHub:** [Security Advisories](https://github.com/GustavoSF643/permissions.api/security/advisories/new) (after the repository is published)
+
+Include:
 
 1. A clear description of the issue and impact
 2. Steps to reproduce (proof of concept if possible)
