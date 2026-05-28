@@ -27,10 +27,11 @@ import {
 } from "@application/users";
 import { Public } from "@modules/auth/decorators/public.decorator";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
+import { PermissionsGuard } from "@modules/auth/guards/permissions.guard";
 
 @ApiTags("users")
 @Controller("users")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class UsersController {
   constructor(
     @Inject(USER_SERVICE)

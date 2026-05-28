@@ -27,11 +27,12 @@ import {
   type PermissionServicePort,
 } from "@application/permissions";
 import { JwtAuthGuard } from "@modules/auth/guards/jwt-auth.guard";
+import { PermissionsGuard } from "@modules/auth/guards/permissions.guard";
 
 @ApiTags("permissions")
 @ApiBearerAuth("access-token")
 @Controller("permissions")
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 export class PermissionsController {
   constructor(
     @Inject(PERMISSION_SERVICE)

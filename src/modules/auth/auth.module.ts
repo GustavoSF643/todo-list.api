@@ -14,16 +14,19 @@ import {
 } from "@application/users";
 import { AppConfigService } from "@config/app-config.service";
 import { ScryptPasswordHasherService } from "@infra/auth/scrypt-password-hasher.service";
+import { RouteEntity } from "@infra/database/entities/route.entity";
 import { UserEntity } from "@infra/database/entities/user.entity";
 import { TypeOrmUserRepository } from "@infra/database/repositories/typeorm-user.repository";
 import { PermissionsModule } from "@modules/permissions/permissions.module";
 
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { PermissionsGuard } from "./guards/permissions.guard";
+import { PermissionRoutesService } from "./services/permission-routes.service";
 
 @Module({
   imports: [
     forwardRef(() => PermissionsModule),
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, RouteEntity]),
     JwtModule.registerAsync({
       inject: [AppConfigService],
       useFactory: (appConfigService: AppConfigService) => ({
@@ -49,13 +52,17 @@ import { JwtAuthGuard } from "./guards/jwt-auth.guard";
       provide: SESSION_SERVICE,
       useClass: SessionService,
     },
+    PermissionRoutesService,
     JwtAuthGuard,
+    PermissionsGuard,
   ],
   exports: [
     USER_SERVICE,
     SESSION_SERVICE,
     JwtModule,
     JwtAuthGuard,
+    PermissionsGuard,
+    PermissionRoutesService,
     PASSWORD_HASHER,
     USER_REPOSITORY,
   ],
