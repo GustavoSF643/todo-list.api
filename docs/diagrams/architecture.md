@@ -1,35 +1,92 @@
-# Diagrama de Arquitetura
+# Diagrama de arquitetura
 
-Visao geral da estrutura atual da `permissions.api`.
+Visão geral da `permissions.api`.
+
+## Fluxo HTTP
+
+```mermaid
+flowchart LR
+  Client[Cliente] --> API[NestJS API]
+  API --> Swagger["/api — Swagger"]
+  API --> Sessions["POST /sessions"]
+  API --> Users["/users"]
+  API --> Permissions["/permissions"]
+  Sessions --> JWT[JWT]
+  Users --> JWT
+  Permissions --> JWT
+  API --> Postgres[(PostgreSQL)]
+  API --> Redis[(Redis opcional)]
+```
+
+## Módulos Nest
 
 ```mermaid
 flowchart TD
-  Client[Cliente HTTP] --> Main[main.ts]
-  Main --> AppModule[AppModule]
-  AppModule --> ConfigModule[ConfigModule]
+  Main[main.ts] --> AppModule[AppModule]
+  AppModule --> ConfigModule[AppConfigModule]
   AppModule --> DatabaseModule[DatabaseModule]
-  Scripts[Scripts CLI] --> TypeOrmDataSource[TypeORM DataSource CLI]
+  AppModule --> CacheModule[CacheInfraModule]
+  AppModule --> AuthModule[AuthModule]
+  AppModule --> UsersModule[UsersModule]
+  AppModule --> SessionsModule[SessionsModule]
+  AppModule --> PermissionsModule[PermissionsModule]
 
-  ConfigModule --> AppConfigService[AppConfigService]
-  DatabaseModule --> TypeOrmConfig[TypeORM Config]
-  TypeOrmConfig --> Postgres[(PostgreSQL)]
-  TypeOrmDataSource --> Postgres
-  DatabaseModule --> Entities[Entities]
-  DatabaseModule --> Enums[Enums]
+  UsersModule --> AuthModule
+  SessionsModule --> AuthModule
+  PermissionsModule --> AuthModule
 
-  Entities --> ModuleEntity[ModuleEntity]
-  Entities --> RouteEntity[RouteEntity]
-  Entities --> PermissionEntity[PermissionEntity]
-  Entities --> UserEntity[UserEntity]
-  Entities --> ModuleRouteEntity[ModuleRouteEntity]
-  Entities --> PermissionModuleEntity[PermissionModuleEntity]
+  AuthModule --> JwtModule[JwtModule]
+  AuthModule --> UserProviders[User + Session providers]
+  PermissionsModule --> PermissionProviders[Permission providers]
 
-  Enums --> RouteMethodEnum[RouteMethodEnum]
+  DatabaseModule --> TypeORM[TypeORM]
+  TypeORM --> Postgres[(PostgreSQL)]
 ```
 
-## Observacoes
+## Camadas
 
-- O modulo de configuracao concentra leitura e validacao das variaveis de ambiente.
-- O modulo de banco encapsula configuracao do TypeORM, mapeamento das entidades e enums de persistencia.
-- A geracao de migrations usa script em `scripts/` e um `data-source` dedicado para o TypeORM CLI.
-- As entidades representam tabelas base (`module`, `route`, `permission`, `user`) e tabelas de associacao (`module_route`, `permission_module`).
+```mermaid
+flowchart TB
+  subgraph modules [modules/]
+    Controllers[Controllers HTTP]
+  end
+
+  subgraph application [application/]
+    AuthCtx[auth]
+    UsersCtx[users]
+    SessionsCtx[sessions]
+    PermissionsCtx[permissions]
+  end
+
+  subgraph infra [infra/]
+    Repos[TypeORM repositories]
+    Hasher[ScryptPasswordHasher]
+    Cache[Cache Redis / memory]
+  end
+
+  Controllers --> application
+  application --> infra
+  Repos --> DB[(PostgreSQL)]
+```
+
+## Contextos de domínio
+
+| Contexto | Service | Rotas |
+|----------|---------|-------|
+| `sessions` | `SessionService` | `POST /sessions` |
+| `users` | `UserService` | `/users` |
+| `permissions` | `PermissionService` | `/permissions` |
+
+`AuthModule` concentra JWT, `JwtAuthGuard`, `PasswordHasher` e repositório de usuários usado no login.
+
+## Infraestrutura de dados
+
+- Entities: `module`, `route`, `permission`, `user`, `module_route`, `permission_module`
+- Migrations via TypeORM CLI (`data-source.ts`)
+- Logs do ORM desabilitados (`logging: false`)
+- `synchronize: false` — schema apenas via migrations
+
+## Scripts e CLI
+
+- `scripts/generate-migration.ts` — wrapper para gerar migrations
+- `pnpm run start:dev` — Nest watch (SWC) + `tsc-alias` para path aliases

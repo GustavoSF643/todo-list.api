@@ -1,130 +1,122 @@
 # Permissions API
 
-API de permissões construída com `NestJS` e `TypeScript`, com configuração tipada e infraestrutura de banco organizada por camadas.
+API de permissões e autenticação construída com NestJS, organizada por camadas (`application`, `infra`, `modules`) e contextos de domínio.
 
 ## Tecnologias
 
-- `Node.js` 20+
-- `NestJS` 11
-- `TypeORM`
-- `PostgreSQL`
-- `Zod` para validação de ambiente
-- `ESLint` + `Prettier`
+- Node.js 20+
+- NestJS 11
+- TypeORM + PostgreSQL
+- JWT (`@nestjs/jwt`)
+- Swagger (`@nestjs/swagger`)
+- TOTP (`otplib`) para 2FA
+- Redis opcional (cache)
+- Zod (validação de ambiente)
+- pnpm, SWC (build), ESLint + Prettier
 
 ## Requisitos
 
 - `node >= 20`
-- `npm >= 10`
-- instância PostgreSQL disponível
+- `pnpm >= 9`
+- Docker (recomendado para Postgres e Redis)
 
-## Quick Start
+## Quick start
 
 ```bash
-npm install
+pnpm install
 cp .env.example .env
-npm run start:dev
+docker compose up -d
+pnpm run migration:run
+pnpm run start:dev
 ```
 
-Aplicação padrão: `http://localhost:5000`.
+- API: `http://localhost:5000`
+- Swagger: `http://localhost:5000/api`
 
 ## Variáveis de ambiente
 
-```env
-# APP
-PORT=5000
-NODE_ENV=development
+Veja `.env.example`. Principais grupos:
 
-# AUTH
-JWT_SECRET=secret
-
-# DATABASE
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-POSTGRES_DATABASE=permissions
-POSTGRES_SSL=false
-```
+| Grupo | Variáveis |
+|-------|-----------|
+| App | `PORT`, `NODE_ENV`, `APP_NAME` |
+| Auth | `JWT_SECRET`, `JWT_EXPIRES_IN` |
+| Database | `POSTGRES_*` |
+| Cache | `REDIS_URL` (opcional; vazio = cache em memória) |
 
 ## Scripts
 
 ```bash
-# app
-npm run start
-npm run start:dev
-npm run build
-npm run start:prod
+# aplicação
+pnpm run start:dev
+pnpm run build
+pnpm run start:prod
 
 # qualidade
-npm run lint
-npm run lint:fix
-npm run format
-npm run format:check
-
-# testes
-npm run test
-npm run test:e2e
-npm run test:cov
+pnpm run lint
+pnpm run lint:fix
+pnpm run format
+pnpm run test
 
 # migrations
-npm run migration:generate -- <nome-da-migration>
-npm run migration:run
-npm run migration:revert
+pnpm run migration:generate -- <nome>
+pnpm run migration:run
+pnpm run migration:revert
 ```
 
-Exemplo:
+## Endpoints
 
-```bash
-npm run migration:generate -- initial_migration
-```
+| Tag | Base | Autenticação |
+|-----|------|----------------|
+| `sessions` | `POST /sessions` | Público (login) |
+| `users` | `/users` | JWT (exceto `POST /users`) |
+| `permissions` | `/permissions` | JWT |
+
+Fluxo sugerido:
+
+1. `POST /permissions` — criar permissão
+2. `POST /users` — cadastrar usuário (informar `permission_id`)
+3. `POST /sessions` — login (`email`, `password`) → `access_token`
+4. Demais rotas com header `Authorization: Bearer <token>`
+
+Detalhes de payloads e schemas: Swagger em `/api`.
 
 ## Estrutura do projeto
 
 ```text
-scripts/
-  generate-migration.ts
-
 src/
-  config/
-    app.config.ts
-    app-config.service.ts
-    config.module.ts
+  application/           # regras de negócio por contexto
+    auth/                # password hasher, JWT payload
+    users/               # usuários, validação de senha, 2FA
+    sessions/            # login e emissão de token
+    permissions/         # CRUD de permissões
+  config/                # env tipado (Zod + AppConfigService)
   infra/
-    database/
-      database.module.ts
-      enums/
-        route-method.enum.ts
-        index.ts
-      typeorm/
-        typeorm.config.ts
-        data-source.ts
-      entities/
-      migrations/
-  app.module.ts
+    auth/                # Scrypt password hasher
+    cache/               # Redis ou in-memory
+    database/            # TypeORM, entities, migrations, repositories
+  modules/               # controllers e wiring Nest
+    auth/                # JwtModule, guards, providers compartilhados
+    users/
+    sessions/
+    permissions/
   main.ts
 ```
 
-## Documentacao
+Aliases TypeScript: `@application/*`, `@config/*`, `@infra/*`, `@modules/*`.
 
-- Guia de documentacao: `docs/README.md`
-- Diagrama de arquitetura: `docs/diagrams/architecture.md`
-- Diagrama PostgreSQL (ERD): `docs/diagrams/postgres-erd.md`
+## Autenticação e 2FA
 
-## Diretrizes de arquitetura
+- Senhas hasheadas com Scrypt (`PasswordHasher`).
+- Cadastro exige senha forte (`@IsSecurePassword`).
+- `two_factor_is_enabled: true` gera secret TOTP via `otplib` e persiste no banco; o secret **não** é aceito nem retornado na API.
+- Validação do código TOTP no login ainda não implementada.
 
-- `config/`: centraliza leitura/validação de variáveis e exposição tipada via `AppConfigService`.
-- `infra/database/`: encapsula integração com TypeORM e evolução de schema (migrations).
-- `scripts/`: automações de linha de comando para tarefas operacionais do projeto.
-- `infra/database/entities/`: mapeia tabelas principais (`module`, `route`, `permission`, `user`) e tabelas de associação (`module_route`, `permission_module`).
-- `infra/database/enums/`: concentra enums reutilizáveis usados no mapeamento de entidades.
-- `infra/database/typeorm/data-source.ts`: configuração específica para o TypeORM CLI (geração/execução de migrations).
-- `app.module.ts`: composição dos módulos de aplicação.
+## Documentação
 
-## Roadmap inicial
-
-- adicionar migrations para consolidar o schema atual
-- incluir CI para `lint`, `build` e `test`
-- adicionar documentação de endpoints (Swagger)
+- [Índice da documentação](./docs/README.md)
+- [Arquitetura](./docs/diagrams/architecture.md)
+- [ERD PostgreSQL](./docs/diagrams/postgres-erd.md)
 
 ## Licença
 

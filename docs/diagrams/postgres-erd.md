@@ -1,11 +1,15 @@
 # Diagrama PostgreSQL (ERD)
 
-Modelo atual do banco PostgreSQL com base nas entidades mapeadas via TypeORM.
+Modelo relacional com base nas entities TypeORM. Todas as tabelas de domínio estendem `BaseEntity`:
+
+- `id` — `SERIAL` (PK interna)
+- `external_id` — `UUID` (identificador exposto na API)
 
 ```mermaid
 erDiagram
   module {
-    UUID id PK
+    INT id PK
+    UUID external_id UK
     VARCHAR name UK
     VARCHAR description
     VARCHAR module_key UK
@@ -16,7 +20,8 @@ erDiagram
   }
 
   route {
-    UUID id PK
+    INT id PK
+    UUID external_id UK
     ENUM method
     VARCHAR path UK
     BOOLEAN is_active
@@ -26,7 +31,8 @@ erDiagram
   }
 
   permission {
-    UUID id PK
+    INT id PK
+    UUID external_id UK
     VARCHAR name UK
     BOOLEAN is_active
     TIMESTAMP created_at
@@ -35,7 +41,8 @@ erDiagram
   }
 
   user {
-    UUID id PK
+    INT id PK
+    UUID external_id UK
     VARCHAR first_name
     VARCHAR last_name
     VARCHAR email UK
@@ -50,7 +57,8 @@ erDiagram
   }
 
   module_route {
-    UUID id PK
+    INT id PK
+    UUID external_id UK
     UUID module_id FK
     UUID route_id FK
     TIMESTAMP created_at
@@ -59,7 +67,8 @@ erDiagram
   }
 
   permission_module {
-    UUID id PK
+    INT id PK
+    UUID external_id UK
     UUID permission_id FK
     UUID module_id FK
     TIMESTAMP created_at
@@ -67,15 +76,21 @@ erDiagram
     TIMESTAMP deleted_at
   }
 
-  permission ||--o{ user : "permission_id"
-  module ||--o{ module_route : "module_id"
-  route ||--o{ module_route : "route_id"
-  permission ||--o{ permission_module : "permission_id"
-  module ||--o{ permission_module : "module_id"
+  permission ||--o{ user : "permission_id → external_id"
+  module ||--o{ module_route : "module_id → external_id"
+  route ||--o{ module_route : "route_id → external_id"
+  permission ||--o{ permission_module : "permission_id → external_id"
+  module ||--o{ permission_module : "module_id → external_id"
 ```
 
-## Observacoes
+## Observações
 
-- Todas as tabelas usam `id` como chave primaria (`uuid` gerado automaticamente).
-- Campos `deleted_at` indicam soft delete quando preenchidos.
-- `route.method` usa enum `RouteMethodEnum` (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`, `HEAD`).
+- **Soft delete:** `deleted_at` preenchido indica registro removido logicamente.
+- **`route.method`:** enum `RouteMethodEnum` (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`, `HEAD`).
+- **FKs na API:** referências usam `external_id` (UUID), não o `id` serial.
+- **Usuário / 2FA:** `two_factor_secret` é gerado pelo servidor (`otplib`) quando `two_factor_is_enabled` é `true`; não é enviado nem exposto em respostas JSON.
+- **Módulos e rotas:** entities mapeadas; endpoints HTTP para `module` / `route` ainda não implementados.
+
+## Migration inicial
+
+`1778701122908-initial_migration.ts` — cria o schema acima com extensão `uuid-ossp`.
