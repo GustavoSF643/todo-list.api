@@ -1,0 +1,16 @@
+---
+description: Use pnpm for all package manager and script invocations in this repo
+alwaysApply: true
+---
+
+# Gerenciador de pacotes (pnpm)
+
+Este projeto usa **pnpm** (há `pnpm-lock.yaml` e o campo `packageManager` no `package.json`).
+
+Ao rodar comandos no terminal ou sugerir comandos ao usuário:
+
+- Preferir **`pnpm install`**, **`pnpm add`**, **`pnpm remove`**, **`pnpm update`** em vez de `npm install` / `npm i` / etc.
+- Preferir **`pnpm run <script>`** ou **`pnpm <script>`** (atalho do pnpm) em vez de `npm run <script>`.
+- Para executar binários locais, usar **`pnpm exec <comando>`** (ou `pnpm dlx` para pacotes não instalados) em vez de `npx`, quando fizer sentido no contexto do projeto.
+
+Não assumir `npm` como padrão neste repositório.
