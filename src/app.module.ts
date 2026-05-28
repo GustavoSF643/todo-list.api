@@ -4,6 +4,7 @@ import { ThrottlerModule, minutes, seconds } from "@nestjs/throttler";
 import { AppConfigModule } from "./config/config.module";
 import { CacheInfraModule } from "./infra/cache/cache.module";
 import { DatabaseModule } from "./infra/database/database.module";
+import { RouteSyncModule } from "./infra/route-sync/route-sync.module";
 import { PermissionsModule } from "./modules/permissions/permissions.module";
 import { SessionsModule } from "./modules/sessions/sessions.module";
 import { UsersModule } from "./modules/users/users.module";
@@ -23,6 +24,7 @@ import { UsersModule } from "./modules/users/users.module";
       errorMessage: "Too Many Requests",
     }),
     DatabaseModule,
+    RouteSyncModule,
     SessionsModule,
     PermissionsModule,
     UsersModule,

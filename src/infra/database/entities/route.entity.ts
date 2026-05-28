@@ -16,7 +16,7 @@ export class RouteEntity extends BaseEntity {
   @Column({ type: "enum", enum: RouteMethodEnum, nullable: false })
   method: RouteMethodEnum;
 
-  @Column({ type: "varchar", length: 255, nullable: false, unique: true })
+  @Column({ type: "varchar", length: 255, nullable: false, unique: false })
   path: string;
 
   @Column({ type: "boolean", default: true, nullable: false })

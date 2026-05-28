@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app.module";
+import { RouteSyncService } from "./infra/route-sync/service/route-sync.service";
 
 function setupSwagger(app: NestExpressApplication): void {
   const config = new DocumentBuilder()
@@ -36,6 +37,9 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+
+  const routeSync = app.get(RouteSyncService);
+  await routeSync.syncRoutes();
 
   setupSwagger(app);
   app.useLogger(new Logger());
