@@ -1,9 +1,5 @@
 import { Body, Controller, Inject, Post } from "@nestjs/common";
-import {
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiTags,
-} from "@nestjs/swagger";
+import { ApiCreatedResponse, ApiOperation, ApiTags } from "@nestjs/swagger";
 
 import {
   CreateSessionDto,

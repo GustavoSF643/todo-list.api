@@ -45,7 +45,9 @@ export class PermissionsGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<Request>();
     const method = request.method.toUpperCase();
-    const path = normalizePath(`${request.baseUrl}${request.route?.path ?? ""}`);
+    const routePath =
+      (request.route as { path?: string } | undefined)?.path ?? "";
+    const path = normalizePath(`${request.baseUrl}${routePath}`);
     const user = request["user"] as JwtPayload | undefined;
 
     if (!user?.permission_id) {
@@ -76,7 +78,9 @@ export class PermissionsGuard implements CanActivate {
     );
 
     if (!hasAccess) {
-      throw new ForbiddenException("Sua conta não possui permissão para acessar este recurso.");
+      throw new ForbiddenException(
+        "Sua conta não possui permissão para acessar este recurso.",
+      );
     }
 
     return true;

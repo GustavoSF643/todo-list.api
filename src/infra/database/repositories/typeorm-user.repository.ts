@@ -40,7 +40,9 @@ export class TypeOrmUserRepository implements UserRepositoryPort {
   }
 
   async softDeleteByExternalId(externalId: string): Promise<boolean> {
-    const result = await this.repository.softDelete({ external_id: externalId });
+    const result = await this.repository.softDelete({
+      external_id: externalId,
+    });
     return Boolean(result.affected);
   }
 }

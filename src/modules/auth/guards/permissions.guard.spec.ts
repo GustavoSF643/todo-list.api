@@ -1,7 +1,4 @@
-import {
-  ExecutionContext,
-  ForbiddenException,
-} from "@nestjs/common";
+import { ExecutionContext, ForbiddenException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Test, TestingModule } from "@nestjs/testing";
 import type { Request } from "express";
@@ -89,7 +86,9 @@ describe("PermissionsGuard", () => {
     );
 
     expect(result).toBe(true);
-    expect(permissionRoutesService.getPermissionRoutesByPermissionId).not.toHaveBeenCalled();
+    expect(
+      permissionRoutesService.getPermissionRoutesByPermissionId,
+    ).not.toHaveBeenCalled();
   });
 
   it("denies when user has no permission_id", async () => {

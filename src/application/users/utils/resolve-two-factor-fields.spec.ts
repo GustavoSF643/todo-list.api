@@ -19,7 +19,9 @@ describe("resolveTwoFactorFields", () => {
   });
 
   it("generates secret when enabling 2FA", () => {
-    jest.spyOn(generator, "generateTwoFactorSecret").mockReturnValue("NEWSECRET");
+    jest
+      .spyOn(generator, "generateTwoFactorSecret")
+      .mockReturnValue("NEWSECRET");
 
     expect(
       resolveTwoFactorFields(

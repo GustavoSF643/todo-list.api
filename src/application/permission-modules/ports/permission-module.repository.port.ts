@@ -1,7 +1,9 @@
 import type { PermissionModuleEntity } from "@infra/database/entities/permission-module.entity";
 
 export interface PermissionModuleRepositoryPort {
-  findActiveByPermissionId(permissionId: string): Promise<PermissionModuleEntity[]>;
+  findActiveByPermissionId(
+    permissionId: string,
+  ): Promise<PermissionModuleEntity[]>;
   findByPermissionIdAndModuleId(
     permissionId: string,
     moduleId: string,

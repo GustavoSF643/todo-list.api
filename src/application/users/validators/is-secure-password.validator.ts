@@ -10,7 +10,9 @@ const SECURE_PASSWORD_PATTERN =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s])[^\s]{8,64}$/;
 
 @ValidatorConstraint({ name: "isSecurePassword", async: false })
-export class IsSecurePasswordConstraint implements ValidatorConstraintInterface {
+export class IsSecurePasswordConstraint
+  implements ValidatorConstraintInterface
+{
   validate(value: unknown): boolean {
     return typeof value === "string" && SECURE_PASSWORD_PATTERN.test(value);
   }

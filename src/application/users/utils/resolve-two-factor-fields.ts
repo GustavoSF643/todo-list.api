@@ -22,8 +22,7 @@ export const resolveTwoFactorFields = (
     };
   }
 
-  const enabled =
-    requestedEnabled ?? existing?.two_factor_is_enabled ?? false;
+  const enabled = requestedEnabled ?? existing?.two_factor_is_enabled ?? false;
 
   if (!enabled) {
     return {

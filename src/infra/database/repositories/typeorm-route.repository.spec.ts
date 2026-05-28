@@ -1,14 +1,14 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { getRepositoryToken } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-
 import { RouteEntity } from "../entities/route.entity";
 import { RouteMethodEnum } from "../enums";
 import { TypeOrmRouteRepository } from "./typeorm-route.repository";
 
 describe("TypeOrmRouteRepository", () => {
   let repository: TypeOrmRouteRepository;
-  const execute = jest.fn().mockResolvedValue({ identifiers: [], generatedMaps: [], raw: [] });
+  const execute = jest
+    .fn()
+    .mockResolvedValue({ identifiers: [], generatedMaps: [], raw: [] });
   const orIgnore = jest.fn().mockReturnValue({ execute });
   const values = jest.fn().mockReturnValue({ orIgnore });
   const into = jest.fn().mockReturnValue({ values });

@@ -21,7 +21,9 @@ class SampleController {
 describe("RouteSyncService", () => {
   let service: RouteSyncService;
   const routeRepository = {
-    bulkUpsert: jest.fn().mockResolvedValue({ identifiers: [], generatedMaps: [], raw: [] }),
+    bulkUpsert: jest
+      .fn()
+      .mockResolvedValue({ identifiers: [], generatedMaps: [], raw: [] }),
   };
 
   beforeEach(async () => {
@@ -50,7 +52,8 @@ describe("RouteSyncService", () => {
         { method: RouteMethodEnum.POST, path: "/sample" },
       ]),
     );
-    expect(routeRepository.bulkUpsert.mock.calls[0][0]).toHaveLength(3);
+    const calls = jest.mocked(routeRepository.bulkUpsert).mock.calls;
+    expect(calls[0]?.[0]).toHaveLength(3);
   });
 
   it("calls bulkUpsert with empty array when no controllers are registered", async () => {

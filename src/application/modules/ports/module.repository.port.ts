@@ -7,9 +7,6 @@ export interface ModuleRepositoryPort {
   findAll(): Promise<ModuleEntity[]>;
   save(moduleEntity: ModuleEntity): Promise<ModuleEntity>;
   create(data: Partial<ModuleEntity>): ModuleEntity;
-  merge(
-    moduleEntity: ModuleEntity,
-    data: Partial<ModuleEntity>,
-  ): ModuleEntity;
+  merge(moduleEntity: ModuleEntity, data: Partial<ModuleEntity>): ModuleEntity;
   softDeleteByExternalId(externalId: string): Promise<boolean>;
 }

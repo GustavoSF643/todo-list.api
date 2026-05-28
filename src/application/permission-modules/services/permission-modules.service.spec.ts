@@ -100,7 +100,9 @@ describe("PermissionModulesService", () => {
     permissionModuleRepository.create.mockImplementation(
       (data) => data as PermissionModuleEntity,
     );
-    permissionModuleRepository.save.mockResolvedValue({} as PermissionModuleEntity);
+    permissionModuleRepository.save.mockResolvedValue(
+      {} as PermissionModuleEntity,
+    );
     permissionModuleRepository.findActiveByPermissionId.mockResolvedValue([
       { module_id: MODULE_A } as PermissionModuleEntity,
       { module_id: MODULE_B } as PermissionModuleEntity,

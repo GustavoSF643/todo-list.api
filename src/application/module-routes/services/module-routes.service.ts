@@ -78,7 +78,9 @@ export class ModuleRoutesService implements ModuleRoutesServicePort {
       );
 
     if (!wasDeleted) {
-      throw new NotFoundException("Vínculo entre módulo e rota não encontrado.");
+      throw new NotFoundException(
+        "Vínculo entre módulo e rota não encontrado.",
+      );
     }
   }
 

@@ -22,13 +22,14 @@ export class RouteSyncService {
     const routes: Array<{ method: RouteMethodEnum; path: string }> = [];
 
     for (const wrapper of controllers) {
-      const instance = wrapper.instance;
-      if (!instance) {
+      const metatype = wrapper.metatype;
+      const instance = wrapper.instance as object | undefined;
+      if (!metatype || !instance) {
         continue;
       }
 
       const controllerPath =
-        this.reflector.get<string>(PATH_METADATA, instance.constructor) ?? "";
+        this.reflector.get<string>(PATH_METADATA, metatype) ?? "";
 
       const prototype = Object.getPrototypeOf(instance) as object;
       const methodNames = this.scanner.getAllMethodNames(prototype);
@@ -39,7 +40,8 @@ export class RouteSyncService {
           continue;
         }
 
-        const routePath = this.reflector.get<string>(PATH_METADATA, handler) ?? "";
+        const routePath =
+          this.reflector.get<string>(PATH_METADATA, handler) ?? "";
         const requestMethod = this.reflector.get<RequestMethod>(
           METHOD_METADATA,
           handler,

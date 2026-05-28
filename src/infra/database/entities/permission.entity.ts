@@ -9,7 +9,6 @@ import { BaseEntity } from "./base.entity";
 
 @Entity("permission")
 export class PermissionEntity extends BaseEntity {
-
   @Column({ type: "varchar", length: 255, nullable: false, unique: true })
   name: string;
 

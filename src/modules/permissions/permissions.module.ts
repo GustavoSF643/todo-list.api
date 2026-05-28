@@ -26,7 +26,11 @@ import { PermissionsController } from "./permissions.controller";
 @Module({
   imports: [
     forwardRef(() => AuthModule),
-    TypeOrmModule.forFeature([PermissionEntity, PermissionModuleEntity, ModuleEntity]),
+    TypeOrmModule.forFeature([
+      PermissionEntity,
+      PermissionModuleEntity,
+      ModuleEntity,
+    ]),
   ],
   controllers: [PermissionsController, PermissionModulesController],
   providers: [
@@ -51,6 +55,10 @@ import { PermissionsController } from "./permissions.controller";
       useClass: PermissionModulesService,
     },
   ],
-  exports: [PERMISSION_REPOSITORY, PERMISSION_SERVICE, PERMISSION_MODULES_SERVICE],
+  exports: [
+    PERMISSION_REPOSITORY,
+    PERMISSION_SERVICE,
+    PERMISSION_MODULES_SERVICE,
+  ],
 })
 export class PermissionsModule {}

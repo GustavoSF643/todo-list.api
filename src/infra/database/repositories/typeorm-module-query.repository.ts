@@ -14,7 +14,7 @@ export class TypeOrmModuleQueryRepository implements ModuleQueryRepositoryPort {
 
   findActiveByExternalIds(externalIds: string[]): Promise<ModuleEntity[]> {
     if (!externalIds.length) {
-      return Promise.resolve([]);
+      return Promise.resolve([] as ModuleEntity[]);
     }
 
     return this.repository.find({

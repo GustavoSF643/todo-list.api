@@ -49,7 +49,9 @@ export class PermissionModulesService implements PermissionModulesServicePort {
     await this.ensurePermissionExists(permissionId);
     await this.ensureModulesExist(payload.module_ids);
 
-    await this.permissionModuleRepository.softDeleteAllByPermissionId(permissionId);
+    await this.permissionModuleRepository.softDeleteAllByPermissionId(
+      permissionId,
+    );
 
     for (const moduleId of payload.module_ids) {
       await this.linkModule(permissionId, moduleId);
@@ -82,11 +84,16 @@ export class PermissionModulesService implements PermissionModulesServicePort {
       );
 
     if (!wasDeleted) {
-      throw new NotFoundException("Vínculo entre permissão e módulo não encontrado.");
+      throw new NotFoundException(
+        "Vínculo entre permissão e módulo não encontrado.",
+      );
     }
   }
 
-  private async linkModule(permissionId: string, moduleId: string): Promise<void> {
+  private async linkModule(
+    permissionId: string,
+    moduleId: string,
+  ): Promise<void> {
     const existing =
       await this.permissionModuleRepository.findByPermissionIdAndModuleId(
         permissionId,
@@ -109,7 +116,9 @@ export class PermissionModulesService implements PermissionModulesServicePort {
 
   private async findModulesByPermissionId(permissionId: string) {
     const links =
-      await this.permissionModuleRepository.findActiveByPermissionId(permissionId);
+      await this.permissionModuleRepository.findActiveByPermissionId(
+        permissionId,
+      );
     const moduleIds = links.map((link) => link.module_id);
 
     if (!moduleIds.length) {

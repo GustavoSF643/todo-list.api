@@ -3,15 +3,8 @@ import { JwtModule } from "@nestjs/jwt";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { PASSWORD_HASHER } from "@application/auth";
-import {
-  SESSION_SERVICE,
-  SessionService,
-} from "@application/sessions";
-import {
-  USER_REPOSITORY,
-  USER_SERVICE,
-  UserService,
-} from "@application/users";
+import { SESSION_SERVICE, SessionService } from "@application/sessions";
+import { USER_REPOSITORY, USER_SERVICE, UserService } from "@application/users";
 import { AppConfigService } from "@config/app-config.service";
 import { ScryptPasswordHasherService } from "@infra/auth/scrypt-password-hasher.service";
 import { RouteEntity } from "@infra/database/entities/route.entity";

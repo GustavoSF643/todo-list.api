@@ -14,7 +14,7 @@ export class TypeOrmRouteQueryRepository implements RouteQueryRepositoryPort {
 
   findActiveByExternalIds(externalIds: string[]): Promise<RouteEntity[]> {
     if (!externalIds.length) {
-      return Promise.resolve([]);
+      return Promise.resolve([] as RouteEntity[]);
     }
 
     return this.repository.find({

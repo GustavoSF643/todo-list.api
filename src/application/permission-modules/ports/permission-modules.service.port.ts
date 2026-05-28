@@ -3,7 +3,9 @@ import { PermissionModuleResponseDto } from "../dto/permission-module-response.d
 import { SyncPermissionModulesDto } from "../dto/sync-permission-modules.dto";
 
 export interface PermissionModulesServicePort {
-  listByPermissionId(permissionId: string): Promise<PermissionModuleResponseDto[]>;
+  listByPermissionId(
+    permissionId: string,
+  ): Promise<PermissionModuleResponseDto[]>;
   sync(
     permissionId: string,
     payload: SyncPermissionModulesDto,

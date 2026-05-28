@@ -130,6 +130,8 @@ describe("UserService", () => {
   it("throws not found when remove fails", async () => {
     userRepository.softDeleteByExternalId.mockResolvedValue(false);
 
-    await expect(service.remove("missing-id")).rejects.toThrow(NotFoundException);
+    await expect(service.remove("missing-id")).rejects.toThrow(
+      NotFoundException,
+    );
   });
 });

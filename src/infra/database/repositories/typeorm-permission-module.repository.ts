@@ -14,7 +14,9 @@ export class TypeOrmPermissionModuleRepository
     private readonly repository: Repository<PermissionModuleEntity>,
   ) {}
 
-  findActiveByPermissionId(permissionId: string): Promise<PermissionModuleEntity[]> {
+  findActiveByPermissionId(
+    permissionId: string,
+  ): Promise<PermissionModuleEntity[]> {
     return this.repository.find({
       where: { permission_id: permissionId, deleted_at: IsNull() },
     });
@@ -57,7 +59,9 @@ export class TypeOrmPermissionModuleRepository
     return Boolean(result.affected);
   }
 
-  async restore(entity: PermissionModuleEntity): Promise<PermissionModuleEntity> {
+  async restore(
+    entity: PermissionModuleEntity,
+  ): Promise<PermissionModuleEntity> {
     await this.repository.restore({ id: entity.id });
     entity.deleted_at = undefined;
     return entity;

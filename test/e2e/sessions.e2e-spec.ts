@@ -5,7 +5,10 @@ import { App } from "supertest/types";
 import { SESSION_SERVICE } from "@application/sessions";
 import { SessionsController } from "@modules/sessions/sessions.controller";
 import { createControllerTestApp } from "../support/app/create-controller-test-app";
-import { E2E_PERMISSION_ID, E2E_USER_ID } from "../support/fixtures/e2e-fixtures";
+import {
+  E2E_PERMISSION_ID,
+  E2E_USER_ID,
+} from "../support/fixtures/e2e-fixtures";
 
 describe("Sessions (e2e)", () => {
   let app: INestApplication<App>;

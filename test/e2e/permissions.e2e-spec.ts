@@ -147,7 +147,9 @@ describe("Permissions (e2e)", () => {
     permissionModulesService.remove.mockResolvedValue(undefined);
 
     await request(app.getHttpServer())
-      .delete(`/permissions/${E2E_PERMISSION_ADMIN_ID}/modules/${E2E_MODULE_ID}`)
+      .delete(
+        `/permissions/${E2E_PERMISSION_ADMIN_ID}/modules/${E2E_MODULE_ID}`,
+      )
       .set(bearer())
       .expect(204);
 

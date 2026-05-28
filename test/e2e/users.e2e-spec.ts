@@ -5,7 +5,10 @@ import { App } from "supertest/types";
 import { USER_SERVICE } from "@application/users";
 import { UsersController } from "@modules/users/users.controller";
 import { createControllerTestApp } from "../support/app/create-controller-test-app";
-import { E2E_PERMISSION_ID, E2E_USER_ID } from "../support/fixtures/e2e-fixtures";
+import {
+  E2E_PERMISSION_ID,
+  E2E_USER_ID,
+} from "../support/fixtures/e2e-fixtures";
 import { bearer } from "../support/http/bearer";
 
 describe("Users (e2e)", () => {

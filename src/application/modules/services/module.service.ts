@@ -86,7 +86,8 @@ export class ModuleService implements ModuleServicePort {
   }
 
   private async ensureModuleKeyIsUnique(moduleKey: string): Promise<void> {
-    const existingModule = await this.moduleRepository.findByModuleKey(moduleKey);
+    const existingModule =
+      await this.moduleRepository.findByModuleKey(moduleKey);
     if (existingModule) {
       throw new ConflictException("Já existe módulo com esta chave.");
     }

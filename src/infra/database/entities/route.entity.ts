@@ -12,7 +12,6 @@ import { RouteMethodEnum } from "../enums";
 @Entity("route")
 @Unique(["method", "path"])
 export class RouteEntity extends BaseEntity {
-
   @Column({ type: "enum", enum: RouteMethodEnum, nullable: false })
   method: RouteMethodEnum;
 

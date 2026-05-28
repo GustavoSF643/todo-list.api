@@ -49,7 +49,8 @@ export class CreateUserDto {
 
   @ApiPropertyOptional({
     example: false,
-    description: "Quando true, o sistema gera e armazena o secret TOTP internamente",
+    description:
+      "Quando true, o sistema gera e armazena o secret TOTP internamente",
   })
   @IsOptional()
   @IsBoolean()

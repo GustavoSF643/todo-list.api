@@ -58,7 +58,10 @@ describe("SessionService", () => {
         { provide: USER_REPOSITORY, useValue: userRepository },
         { provide: PASSWORD_HASHER, useValue: passwordHasher },
         { provide: JwtService, useValue: jwtService },
-        { provide: AppConfigService, useValue: { auth: { jwt_expires_in: 3600 } } },
+        {
+          provide: AppConfigService,
+          useValue: { auth: { jwt_expires_in: 3600 } },
+        },
       ],
     }).compile();
 

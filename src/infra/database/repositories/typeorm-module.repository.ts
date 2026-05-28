@@ -36,10 +36,7 @@ export class TypeOrmModuleRepository implements ModuleRepositoryPort {
     return this.repository.create(data);
   }
 
-  merge(
-    moduleEntity: ModuleEntity,
-    data: Partial<ModuleEntity>,
-  ): ModuleEntity {
+  merge(moduleEntity: ModuleEntity, data: Partial<ModuleEntity>): ModuleEntity {
     return this.repository.merge(moduleEntity, data);
   }
 
