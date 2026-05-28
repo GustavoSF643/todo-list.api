@@ -8,6 +8,7 @@ export const appConfig = registerAs("appConfig", () => ({
   },
   auth: {
     jwt_secret: process.env.JWT_SECRET,
+    jwt_expires_in: parseInt(process.env.JWT_EXPIRES_IN || "3600"),
   },
   database: {
     host: process.env.POSTGRES_HOST,

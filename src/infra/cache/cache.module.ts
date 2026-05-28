@@ -6,8 +6,8 @@ import {
 import { minutes } from "@nestjs/throttler";
 import { createKeyv } from "@keyv/redis";
 
-import { AppConfigModule } from "../../config/config.module";
-import { AppConfigService } from "../../config/app-config.service";
+import { AppConfigModule } from "@config/config.module";
+import { AppConfigService } from "@config/app-config.service";
 
 @Module({
   imports: [

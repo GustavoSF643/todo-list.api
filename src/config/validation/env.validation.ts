@@ -9,6 +9,7 @@ export const envValidationSchema = z.object({
 
   // auth
   JWT_SECRET: z.string(),
+  JWT_EXPIRES_IN: z.string().default("3600"),
 
   // database
   POSTGRES_HOST: z.string(),
@@ -18,12 +19,9 @@ export const envValidationSchema = z.object({
   POSTGRES_DATABASE: z.string(),
   POSTGRES_SSL: z.string().default("false"),
 
-  REDIS_URL: z.preprocess(
-    (val) => {
-      if (val === undefined || val === "") return undefined;
-      if (typeof val === "string" && val.trim() === "") return undefined;
-      return val;
-    },
-    z.url().optional(),
-  ),
+  REDIS_URL: z.preprocess((val) => {
+    if (val === undefined || val === "") return undefined;
+    if (typeof val === "string" && val.trim() === "") return undefined;
+    return val;
+  }, z.url().optional()),
 });

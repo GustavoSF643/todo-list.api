@@ -1,6 +1,6 @@
 import { Provider } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { AppConfig } from "./app.config";
+import type { AppConfig } from "./app.config";
 
 export const APP_CONFIG = "APP_CONFIG";
 
