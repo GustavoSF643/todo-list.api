@@ -32,7 +32,7 @@ jobs:
         run: pnpm run build
 
       - name: Unit tests
-        run: pnpm run test -- --runInBand
+        run: pnpm run test --runInBand
 
       - name: E2E tests
-        run: pnpm run test:e2e -- --runInBand
+        run: pnpm run test:e2e --runInBand
