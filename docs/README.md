@@ -37,6 +37,31 @@ Cada contexto expõe DTOs, ports, services e tokens de injeção via `index.ts`.
 - O vínculo `module_route` define quais rotas pertencem a cada módulo.
 - Usuário autenticado com uma permissão que possua módulos vinculados recebe acesso a todas as rotas desses módulos.
 
+## Branches e CI
+
+| Branch | Uso |
+|--------|-----|
+| `main` | Produção / releases estáveis |
+| `development` | Integração contínua; base para PRs de features |
+
+O workflow **CI** roda em push e pull request para `main` e `development`.
+
+### Proteção de branches (GitHub)
+
+Configure em **Settings → Branches → Add branch protection rule**:
+
+**`main`**
+
+- Require a pull request before merging
+- Require status checks to pass: job `test` (workflow CI)
+- Do not allow bypassing the above settings
+
+**`development`** (opcional, mais leve)
+
+- Require status checks to pass: job `test`
+
+Fluxo sugerido: `feature/*` → PR para `development` → PR de `development` para `main`.
+
 ## Operação local
 
 ```bash
