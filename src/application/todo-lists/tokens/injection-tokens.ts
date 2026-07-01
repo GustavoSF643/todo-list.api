@@ -1,0 +1,2 @@
+export const TODO_LIST_REPOSITORY = Symbol("TODO_LIST_REPOSITORY");
+export const TODO_LIST_SERVICE = Symbol("TODO_LIST_SERVICE");

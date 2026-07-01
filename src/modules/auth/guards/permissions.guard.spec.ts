@@ -36,7 +36,7 @@ describe("PermissionsGuard", () => {
     permissionRepository = {
       findByExternalId: jest.fn(),
       findByName: jest.fn(),
-      findAll: jest.fn(),
+      findAllPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),

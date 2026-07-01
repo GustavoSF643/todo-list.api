@@ -1,6 +1,15 @@
-# Permissions API
+# Permissions API — Auth, RBAC & Todo Lists
 
-API de permissões e autenticação construída com NestJS, organizada por camadas (`application`, `infra`, `modules`) e contextos de domínio.
+API REST em **NestJS** para autenticação JWT, autorização por módulos/rotas (RBAC), gestão de usuários e permissões, e domínio de **todo-lists** com visibilidade private/public. Projeto de portfólio com arquitetura em camadas, TypeORM, PostgreSQL, testes e documentação OpenAPI.
+
+## O que este projeto demonstra
+
+- **Autenticação:** login (`POST /sessions`), JWT, hash de senha (Scrypt), suporte a 2FA (TOTP via `otplib`)
+- **Autorização (RBAC):** permissões → módulos → rotas; `PermissionsGuard` valida `method + path` por usuário
+- **Domínio de negócio:** todo-lists e todo-items com owner, listas públicas/privadas e regras de leitura/escrita
+- **API design:** paginação padronizada (`{ data, meta }`), DTOs com `class-validator`, Swagger em `/api`
+- **Arquitetura:** ports & adapters (`application` / `infra` / `modules`), repositórios TypeORM, soft delete, UUID na API
+- **Qualidade:** testes unitários e e2e (Jest), CI, migrations versionadas, OpenSpec para evolução spec-driven
 
 ## Tecnologias
 
@@ -74,6 +83,48 @@ pnpm run migration:revert
 | `modules` | `/modules` | JWT |
 | `module-routes` | `/modules/:moduleId/routes` | JWT |
 | `permission-modules` | `/permissions/:permissionId/modules` | JWT |
+| `todo-lists` | `/todo-lists` | JWT |
+
+### Paginação em listagens (breaking change)
+
+Todos os endpoints `GET` que retornam coleções usam o envelope `{ data, meta }` em vez de um array na raiz.
+
+| Query | Padrão | Regra |
+|-------|--------|-------|
+| `page` | `1` | Inteiro ≥ 1; inválido → `400` |
+| `limit` | `20` | Inteiro ≥ 1; valores acima de `100` são limitados a `100` (sem erro) |
+
+`meta`: `{ page, limit, total, total_pages }`.
+
+Endpoints paginados:
+
+- `GET /users`
+- `GET /permissions`
+- `GET /modules`
+- `GET /permissions/:permissionId/modules`
+- `GET /modules/:moduleId/routes`
+- `GET /todo-lists`
+- `GET /todo-lists/public`
+- `GET /todo-lists/:listId/items`
+
+`PUT`/`POST` de vínculos (`/permissions/:id/modules`, `/modules/:id/routes`) continuam retornando array completo após sync/add.
+
+### Módulos sugeridos (todo-lists)
+
+| module_key | Rotas |
+|------------|-------|
+| `TODO_LIST_READ` | `GET /todo-lists`, `GET /todo-lists/public`, `GET /todo-lists/:id` |
+| `TODO_LIST_WRITE` | `POST /todo-lists`, `PATCH /todo-lists/:id`, `DELETE /todo-lists/:id` |
+| `TODO_ITEM_READ` | `GET /todo-lists/:listId/items` |
+| `TODO_ITEM_WRITE` | `POST /todo-lists/:listId/items`, `PATCH /todo-lists/:listId/items/:itemId`, `DELETE /todo-lists/:listId/items/:itemId` |
+
+Vincule as rotas aos módulos via `PUT /modules/:moduleId/routes` e os módulos à permissão via `PUT /permissions/:permissionId/modules`.
+
+Regras de domínio (além do `PermissionsGuard`):
+
+- Cada lista pertence a um usuário (`user_id`).
+- `is_public: false` — só o owner lê/edita.
+- `is_public: true` — outros usuários autenticados podem **ler** lista e itens; apenas o owner **edita**.
 
 Fluxo sugerido:
 
@@ -89,11 +140,14 @@ Detalhes de payloads e schemas: Swagger em `/api`.
 ```text
 src/
   application/           # regras de negócio por contexto
+    common/pagination/   # DTOs e helpers de paginação
     auth/                # password hasher, JWT payload
     users/               # usuários, validação de senha, 2FA
     sessions/            # login e emissão de token
     permissions/         # CRUD de permissões
     modules/             # CRUD de módulos
+    todo-lists/          # listas de tarefas por usuário
+    todo-items/          # itens de listas
     module-routes/       # vínculo módulo ↔ rotas
     permission-modules/  # vínculo permissão ↔ módulos
   config/                # env tipado (Zod + AppConfigService)
@@ -107,6 +161,7 @@ src/
     sessions/
     permissions/
     modules/
+    todo-lists/
   main.ts
 ```
 

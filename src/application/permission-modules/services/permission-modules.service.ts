@@ -9,6 +9,11 @@ import {
   PERMISSION_REPOSITORY,
   type PermissionRepositoryPort,
 } from "@application/permissions";
+import {
+  parsePaginationQuery,
+  toPaginatedResponse,
+  type PaginationQueryDto,
+} from "@application/common/pagination";
 import { AddPermissionModulesDto } from "../dto/add-permission-modules.dto";
 import { PermissionModuleResponseDto } from "../dto/permission-module-response.dto";
 import { SyncPermissionModulesDto } from "../dto/sync-permission-modules.dto";
@@ -32,13 +37,22 @@ export class PermissionModulesService implements PermissionModulesServicePort {
     private readonly moduleQueryRepository: ModuleQueryRepositoryPort,
   ) {}
 
-  async listByPermissionId(
-    permissionId: string,
-  ): Promise<PermissionModuleResponseDto[]> {
+  async listByPermissionId(permissionId: string, query: PaginationQueryDto) {
     await this.ensurePermissionExists(permissionId);
-    const modules = await this.findModulesByPermissionId(permissionId);
-    return modules.map((moduleEntity) =>
-      toPermissionModuleResponseDto(moduleEntity),
+    const pagination = parsePaginationQuery(query);
+    const { items: links, total } =
+      await this.permissionModuleRepository.findActiveByPermissionIdPaginated(
+        permissionId,
+        pagination.skip,
+        pagination.take,
+      );
+    const modules = await this.resolveModulesFromLinks(links);
+    return toPaginatedResponse(
+      modules.map((moduleEntity) =>
+        toPermissionModuleResponseDto(moduleEntity),
+      ),
+      total,
+      pagination,
     );
   }
 
@@ -57,7 +71,7 @@ export class PermissionModulesService implements PermissionModulesServicePort {
       await this.linkModule(permissionId, moduleId);
     }
 
-    return this.listByPermissionId(permissionId);
+    return this.listAllByPermissionId(permissionId);
   }
 
   async add(
@@ -71,7 +85,7 @@ export class PermissionModulesService implements PermissionModulesServicePort {
       await this.linkModule(permissionId, moduleId);
     }
 
-    return this.listByPermissionId(permissionId);
+    return this.listAllByPermissionId(permissionId);
   }
 
   async remove(permissionId: string, moduleId: string): Promise<void> {
@@ -112,6 +126,33 @@ export class PermissionModulesService implements PermissionModulesServicePort {
     if (existing.deleted_at) {
       await this.permissionModuleRepository.restore(existing);
     }
+  }
+
+  private async listAllByPermissionId(
+    permissionId: string,
+  ): Promise<PermissionModuleResponseDto[]> {
+    const modules = await this.findModulesByPermissionId(permissionId);
+    return modules.map((moduleEntity) =>
+      toPermissionModuleResponseDto(moduleEntity),
+    );
+  }
+
+  private async resolveModulesFromLinks(links: { module_id: string }[]) {
+    const moduleIds = links.map((link) => link.module_id);
+
+    if (!moduleIds.length) {
+      return [];
+    }
+
+    const modules =
+      await this.moduleQueryRepository.findActiveByExternalIds(moduleIds);
+    const moduleById = new Map(
+      modules.map((moduleEntity) => [moduleEntity.external_id, moduleEntity]),
+    );
+
+    return moduleIds
+      .map((moduleId) => moduleById.get(moduleId))
+      .filter((moduleEntity) => moduleEntity !== undefined);
   }
 
   private async findModulesByPermissionId(permissionId: string) {

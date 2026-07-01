@@ -1,9 +1,13 @@
+import type { PaginatedResult } from "@application/common/pagination";
 import type { PermissionEntity } from "@infra/database/entities/permission.entity";
 
 export interface PermissionRepositoryPort {
   findByExternalId(externalId: string): Promise<PermissionEntity | null>;
   findByName(name: string): Promise<PermissionEntity | null>;
-  findAll(): Promise<PermissionEntity[]>;
+  findAllPaginated(
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<PermissionEntity>>;
   save(permission: PermissionEntity): Promise<PermissionEntity>;
   create(data: Partial<PermissionEntity>): PermissionEntity;
   merge(

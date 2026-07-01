@@ -35,7 +35,7 @@ describe("PermissionModulesService", () => {
     permissionRepository = {
       findByExternalId: jest.fn(),
       findByName: jest.fn(),
-      findAll: jest.fn(),
+      findAllPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),
@@ -46,6 +46,7 @@ describe("PermissionModulesService", () => {
 
     permissionModuleRepository = {
       findActiveByPermissionId: jest.fn(),
+      findActiveByPermissionIdPaginated: jest.fn(),
       findByPermissionIdAndModuleId: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
@@ -75,17 +76,20 @@ describe("PermissionModulesService", () => {
 
   it("lists modules linked to permission", async () => {
     permissionRepository.findByExternalId.mockResolvedValue({} as never);
-    permissionModuleRepository.findActiveByPermissionId.mockResolvedValue([
-      { module_id: MODULE_A } as PermissionModuleEntity,
-    ]);
+    permissionModuleRepository.findActiveByPermissionIdPaginated.mockResolvedValue(
+      {
+        items: [{ module_id: MODULE_A } as PermissionModuleEntity],
+        total: 1,
+      },
+    );
     moduleQueryRepository.findActiveByExternalIds.mockResolvedValue([
       makeModule(MODULE_A),
     ]);
 
-    const result = await service.listByPermissionId(PERMISSION_ID);
+    const result = await service.listByPermissionId(PERMISSION_ID, {});
 
-    expect(result).toHaveLength(1);
-    expect(result[0].id).toBe(MODULE_A);
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].id).toBe(MODULE_A);
   });
 
   it("sync replaces permission-module links", async () => {

@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -20,6 +21,11 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import {
+  ApiPaginatedOkResponse,
+  ApiPaginationQuery,
+  PaginationQueryDto,
+} from "@application/common/pagination";
 import {
   AddModuleRoutesDto,
   MODULE_ROUTES_SERVICE,
@@ -42,11 +48,13 @@ export class ModuleRoutesController {
 
   @Get()
   @ApiOperation({ summary: "Listar rotas vinculadas ao módulo" })
-  @ApiOkResponse({ type: ModuleRouteResponseDto, isArray: true })
+  @ApiPaginationQuery()
+  @ApiPaginatedOkResponse(ModuleRouteResponseDto)
   list(
     @Param("moduleId", ParseUUIDPipe) moduleId: string,
-  ): Promise<ModuleRouteResponseDto[]> {
-    return this.moduleRoutesService.listByModuleId(moduleId);
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.moduleRoutesService.listByModuleId(moduleId, query);
   }
 
   @Put()

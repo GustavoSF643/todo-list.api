@@ -8,6 +8,11 @@ import {
 import type { PasswordHasher } from "@application/auth";
 import { PASSWORD_HASHER } from "@application/auth";
 import {
+  parsePaginationQuery,
+  toPaginatedResponse,
+  type PaginationQueryDto,
+} from "@application/common/pagination";
+import {
   PERMISSION_REPOSITORY,
   type PermissionRepositoryPort,
 } from "@application/permissions";
@@ -46,9 +51,17 @@ export class UserService implements UserServicePort {
     return toUserResponseDto(createdUser);
   }
 
-  async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.userRepository.findAll();
-    return users.map((user) => toUserResponseDto(user));
+  async findAll(query: PaginationQueryDto) {
+    const pagination = parsePaginationQuery(query);
+    const { items, total } = await this.userRepository.findAllPaginated(
+      pagination.skip,
+      pagination.take,
+    );
+    return toPaginatedResponse(
+      items.map((user) => toUserResponseDto(user)),
+      total,
+      pagination,
+    );
   }
 
   async findByExternalId(externalId: string): Promise<UserResponseDto> {

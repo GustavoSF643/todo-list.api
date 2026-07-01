@@ -5,6 +5,12 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 
+import {
+  parsePaginationQuery,
+  toPaginatedResponse,
+  type PaginationQueryDto,
+} from "@application/common/pagination";
+
 import { CreatePermissionDto } from "../dto/create-permission.dto";
 import { PermissionResponseDto } from "../dto/permission-response.dto";
 import { UpdatePermissionDto } from "../dto/update-permission.dto";
@@ -28,9 +34,17 @@ export class PermissionService implements PermissionServicePort {
     return toPermissionResponseDto(createdPermission);
   }
 
-  async findAll(): Promise<PermissionResponseDto[]> {
-    const permissions = await this.permissionRepository.findAll();
-    return permissions.map((permission) => toPermissionResponseDto(permission));
+  async findAll(query: PaginationQueryDto) {
+    const pagination = parsePaginationQuery(query);
+    const { items, total } = await this.permissionRepository.findAllPaginated(
+      pagination.skip,
+      pagination.take,
+    );
+    return toPaginatedResponse(
+      items.map((permission) => toPermissionResponseDto(permission)),
+      total,
+      pagination,
+    );
   }
 
   async findByExternalId(externalId: string): Promise<PermissionResponseDto> {

@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -19,6 +20,11 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import {
+  ApiPaginatedOkResponse,
+  ApiPaginationQuery,
+  PaginationQueryDto,
+} from "@application/common/pagination";
 import {
   CreateModuleDto,
   MODULE_SERVICE,
@@ -48,9 +54,10 @@ export class ModulesController {
 
   @Get()
   @ApiOperation({ summary: "Listar módulos" })
-  @ApiOkResponse({ type: ModuleResponseDto, isArray: true })
-  findAll(): Promise<ModuleResponseDto[]> {
-    return this.moduleService.findAll();
+  @ApiPaginationQuery()
+  @ApiPaginatedOkResponse(ModuleResponseDto)
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.moduleService.findAll(query);
   }
 
   @Get(":id")

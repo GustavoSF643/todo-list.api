@@ -7,6 +7,7 @@ import { ModulesController } from "@modules/modules/modules.controller";
 import { createControllerTestApp } from "../support/app/create-controller-test-app";
 import { E2E_MODULE_ID } from "../support/fixtures/e2e-fixtures";
 import { bearer } from "../support/http/bearer";
+import { paginatedResponse } from "../support/http/paginated-response";
 
 describe("Modules (e2e)", () => {
   let app: INestApplication<App>;
@@ -75,25 +76,33 @@ describe("Modules (e2e)", () => {
   });
 
   it("GET /modules with token returns modules list", async () => {
-    moduleService.findAll.mockResolvedValue([
-      {
-        id: E2E_MODULE_ID,
-        name: "Usuários",
-        description: "Operações relacionadas ao cadastro de usuários",
-        module_key: "USERS",
-        is_active: true,
-        created_at: "2026-01-01T00:00:00.000Z",
-        updated_at: "2026-01-01T00:00:00.000Z",
-      },
-    ]);
+    moduleService.findAll.mockResolvedValue(
+      paginatedResponse([
+        {
+          id: E2E_MODULE_ID,
+          name: "Usuários",
+          description: "Operações relacionadas ao cadastro de usuários",
+          module_key: "USERS",
+          is_active: true,
+          created_at: "2026-01-01T00:00:00.000Z",
+          updated_at: "2026-01-01T00:00:00.000Z",
+        },
+      ]),
+    );
 
     const response = await request(app.getHttpServer())
       .get("/modules")
       .set(bearer())
       .expect(200);
 
-    expect(response.body).toHaveLength(1);
-    expect(moduleService.findAll).toHaveBeenCalledTimes(1);
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.meta).toMatchObject({
+      page: 1,
+      limit: 20,
+      total: 1,
+      total_pages: 1,
+    });
+    expect(moduleService.findAll).toHaveBeenCalledWith({});
   });
 
   it("GET /modules/:id returns module", async () => {

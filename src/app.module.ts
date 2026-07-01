@@ -9,6 +9,7 @@ import { SessionsModule } from "./modules/sessions/sessions.module";
 import { PermissionsModule } from "./modules/permissions/permissions.module";
 import { UsersModule } from "./modules/users/users.module";
 import { ModulesModule } from "./modules/modules/modules.module";
+import { TodoListsModule } from "./modules/todo-lists/todo-lists.module";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ModulesModule } from "./modules/modules/modules.module";
     PermissionsModule,
     UsersModule,
     ModulesModule,
+    TodoListsModule,
   ],
   controllers: [],
   providers: [],

@@ -7,6 +7,7 @@ import { ModuleRoutesController } from "@modules/modules/module-routes.controlle
 import { createControllerTestApp } from "../support/app/create-controller-test-app";
 import { E2E_MODULE_ID, E2E_ROUTE_ID } from "../support/fixtures/e2e-fixtures";
 import { bearer } from "../support/http/bearer";
+import { paginatedResponse } from "../support/http/paginated-response";
 
 describe("Module routes (e2e)", () => {
   let app: INestApplication<App>;
@@ -35,23 +36,27 @@ describe("Module routes (e2e)", () => {
   });
 
   it("GET /modules/:id/routes returns linked routes", async () => {
-    moduleRoutesService.listByModuleId.mockResolvedValue([
-      {
-        id: E2E_ROUTE_ID,
-        method: "GET",
-        path: "/users",
-        is_active: true,
-      },
-    ]);
+    moduleRoutesService.listByModuleId.mockResolvedValue(
+      paginatedResponse([
+        {
+          id: E2E_ROUTE_ID,
+          method: "GET",
+          path: "/users",
+          is_active: true,
+        },
+      ]),
+    );
 
     const response = await request(app.getHttpServer())
       .get(`/modules/${E2E_MODULE_ID}/routes`)
       .set(bearer())
       .expect(200);
 
-    expect(response.body).toHaveLength(1);
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.meta.total_pages).toBe(1);
     expect(moduleRoutesService.listByModuleId).toHaveBeenCalledWith(
       E2E_MODULE_ID,
+      {},
     );
   });
 

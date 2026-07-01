@@ -36,7 +36,7 @@ describe("SessionService", () => {
     userRepository = {
       findByEmail: jest.fn(),
       findByExternalId: jest.fn(),
-      findAll: jest.fn(),
+      findAllPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),

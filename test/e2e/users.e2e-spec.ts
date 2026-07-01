@@ -10,6 +10,7 @@ import {
   E2E_USER_ID,
 } from "../support/fixtures/e2e-fixtures";
 import { bearer } from "../support/http/bearer";
+import { paginatedResponse } from "../support/http/paginated-response";
 
 describe("Users (e2e)", () => {
   let app: INestApplication<App>;
@@ -41,23 +42,46 @@ describe("Users (e2e)", () => {
   });
 
   it("GET /users with token returns users list", async () => {
-    userService.findAll.mockResolvedValue([
-      {
-        id: E2E_USER_ID,
-        permission_id: E2E_PERMISSION_ID,
-        first_name: "John",
-        last_name: "Doe",
-        email: "john@example.com",
-      },
-    ]);
+    userService.findAll.mockResolvedValue(
+      paginatedResponse([
+        {
+          id: E2E_USER_ID,
+          permission_id: E2E_PERMISSION_ID,
+          first_name: "John",
+          last_name: "Doe",
+          email: "john@example.com",
+        },
+      ]),
+    );
 
     const response = await request(app.getHttpServer())
       .get("/users")
       .set(bearer())
       .expect(200);
 
-    expect(response.body).toHaveLength(1);
-    expect(userService.findAll).toHaveBeenCalledTimes(1);
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.meta.page).toBe(1);
+    expect(userService.findAll).toHaveBeenCalledWith({});
+  });
+
+  it("GET /users forwards pagination query to service", async () => {
+    userService.findAll.mockResolvedValue(
+      paginatedResponse([], { page: 2, limit: 10, total: 0, total_pages: 0 }),
+    );
+
+    await request(app.getHttpServer())
+      .get("/users?page=2&limit=10")
+      .set(bearer())
+      .expect(200);
+
+    expect(userService.findAll).toHaveBeenCalledWith({ page: 2, limit: 10 });
+  });
+
+  it("GET /users with invalid page returns 400", () => {
+    return request(app.getHttpServer())
+      .get("/users?page=0")
+      .set(bearer())
+      .expect(400);
   });
 
   it("POST /users is public and creates user", async () => {

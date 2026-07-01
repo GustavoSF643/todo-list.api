@@ -38,7 +38,7 @@ describe("UserService", () => {
     userRepository = {
       findByEmail: jest.fn(),
       findByExternalId: jest.fn(),
-      findAll: jest.fn(),
+      findAllPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),
@@ -48,7 +48,7 @@ describe("UserService", () => {
     permissionRepository = {
       findByExternalId: jest.fn(),
       findByName: jest.fn(),
-      findAll: jest.fn(),
+      findAllPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),
@@ -133,5 +133,24 @@ describe("UserService", () => {
     await expect(service.remove("missing-id")).rejects.toThrow(
       NotFoundException,
     );
+  });
+
+  it("returns paginated users", async () => {
+    const user = makeUser();
+    userRepository.findAllPaginated.mockResolvedValue({
+      items: [user],
+      total: 1,
+    });
+
+    const result = await service.findAll({ page: 2, limit: 10 });
+
+    expect(userRepository.findAllPaginated).toHaveBeenCalledWith(10, 10);
+    expect(result.data).toHaveLength(1);
+    expect(result.meta).toEqual({
+      page: 2,
+      limit: 10,
+      total: 1,
+      total_pages: 1,
+    });
   });
 });

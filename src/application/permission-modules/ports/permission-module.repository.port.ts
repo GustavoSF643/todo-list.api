@@ -1,9 +1,15 @@
+import type { PaginatedResult } from "@application/common/pagination";
 import type { PermissionModuleEntity } from "@infra/database/entities/permission-module.entity";
 
 export interface PermissionModuleRepositoryPort {
   findActiveByPermissionId(
     permissionId: string,
   ): Promise<PermissionModuleEntity[]>;
+  findActiveByPermissionIdPaginated(
+    permissionId: string,
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<PermissionModuleEntity>>;
   findByPermissionIdAndModuleId(
     permissionId: string,
     moduleId: string,

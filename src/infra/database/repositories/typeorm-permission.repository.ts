@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
+import type { PaginatedResult } from "@application/common/pagination";
 import type { PermissionRepositoryPort } from "@application/permissions";
 import { PermissionEntity } from "../entities/permission.entity";
 
@@ -20,8 +21,12 @@ export class TypeOrmPermissionRepository implements PermissionRepositoryPort {
     return this.repository.findOne({ where: { name } });
   }
 
-  findAll(): Promise<PermissionEntity[]> {
-    return this.repository.find();
+  async findAllPaginated(
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<PermissionEntity>> {
+    const [items, total] = await this.repository.findAndCount({ skip, take });
+    return { items, total };
   }
 
   save(permission: PermissionEntity): Promise<PermissionEntity> {

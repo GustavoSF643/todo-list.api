@@ -1,9 +1,17 @@
+import type {
+  PaginatedResponseDto,
+  PaginationQueryDto,
+} from "@application/common/pagination";
+
 import { AddModuleRoutesDto } from "../dto/add-module-routes.dto";
 import { ModuleRouteResponseDto } from "../dto/module-route-response.dto";
 import { SyncModuleRoutesDto } from "../dto/sync-module-routes.dto";
 
 export interface ModuleRoutesServicePort {
-  listByModuleId(moduleId: string): Promise<ModuleRouteResponseDto[]>;
+  listByModuleId(
+    moduleId: string,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<ModuleRouteResponseDto>>;
   sync(
     moduleId: string,
     payload: SyncModuleRoutesDto,

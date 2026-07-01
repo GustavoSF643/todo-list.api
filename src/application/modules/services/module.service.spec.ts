@@ -28,7 +28,7 @@ describe("ModuleService", () => {
       findByExternalId: jest.fn(),
       findByName: jest.fn(),
       findByModuleKey: jest.fn(),
-      findAll: jest.fn(),
+      findAllPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),
@@ -67,12 +67,16 @@ describe("ModuleService", () => {
   });
 
   it("lists all modules", async () => {
-    moduleRepository.findAll.mockResolvedValue([makeModule()]);
+    moduleRepository.findAllPaginated.mockResolvedValue({
+      items: [makeModule()],
+      total: 1,
+    });
 
-    const result = await service.findAll();
+    const result = await service.findAll({});
 
-    expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("Usuários");
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].name).toBe("Usuários");
+    expect(result.meta.total).toBe(1);
   });
 
   it("finds module by external id", async () => {
