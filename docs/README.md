@@ -1,6 +1,6 @@
 # Documentação
 
-Documentação técnica da **permissions.api** — API NestJS de autenticação JWT, autorização RBAC por módulos/rotas, gestão de usuários/permissões e domínio de todo-lists.
+Documentação técnica da **Todo Lists API** (repositório `permissions.api`) — backend NestJS de listas de tarefas com auth JWT e autorização RBAC por módulos/rotas.
 
 ## Conteúdo
 
@@ -20,6 +20,9 @@ Com a aplicação rodando:
 
 | Contexto | Responsabilidade |
 |----------|------------------|
+| `todo-lists` | CRUD de listas de tarefas por usuário (`is_public`) |
+| `todo-items` | CRUD de itens aninhados em listas |
+| `common/pagination` | DTOs e helpers compartilhados (`page`/`limit`, envelope `{ data, meta }`) |
 | `auth` | Portas compartilhadas (`PasswordHasher`), tipo `JwtPayload` |
 | `users` | CRUD de usuários, senha forte, geração de secret 2FA |
 | `sessions` | Login e emissão de JWT |
@@ -27,9 +30,6 @@ Com a aplicação rodando:
 | `modules` | CRUD de módulos (blocos funcionais do front) |
 | `module-routes` | Vínculo entre módulo e rotas (`module_route`) |
 | `permission-modules` | Vínculo entre permissão e módulos (`permission_module`) |
-| `todo-lists` | CRUD de listas de tarefas por usuário (`is_public`) |
-| `todo-items` | CRUD de itens aninhados em listas |
-| `common/pagination` | DTOs e helpers compartilhados (`page`/`limit`, envelope `{ data, meta }`) |
 
 Cada contexto expõe DTOs, ports, services e tokens de injeção via `index.ts`.
 

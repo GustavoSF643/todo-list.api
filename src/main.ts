@@ -8,13 +8,11 @@ import { RouteSyncService } from "./infra/route-sync/service/route-sync.service"
 
 function setupSwagger(app: NestExpressApplication): void {
   const config = new DocumentBuilder()
-    .setTitle(
-      process.env.APP_NAME ?? "Permissions API — Auth, RBAC & Todo Lists",
-    )
+    .setTitle(process.env.APP_NAME ?? "Todo Lists API — Auth & RBAC")
     .setDescription(
-      "REST API com autenticação JWT, autorização por módulos/rotas (RBAC), CRUD de usuários e permissões, " +
-        "todo-lists com visibilidade private/public, paginação padronizada e documentação OpenAPI. " +
-        "Stack: NestJS, TypeORM, PostgreSQL, Redis (opcional).",
+      "API REST de listas de tarefas com itens aninhados e visibilidade private/public. " +
+        "Inclui autenticação JWT, autorização por módulos/rotas (RBAC), gestão de usuários/permissões, " +
+        "paginação padronizada e documentação OpenAPI. Stack: NestJS, TypeORM, PostgreSQL, Redis (opcional).",
     )
     .setVersion("1.0")
     .addBearerAuth(
