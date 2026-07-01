@@ -97,19 +97,15 @@ describe("TodoItemService", () => {
     todoItemRepository.create.mockReturnValue(item);
     todoItemRepository.save.mockResolvedValue(item);
 
-    const result = await service.create(
-      list.external_id,
-      list.user_id,
-      { title: "Leite" },
-    );
+    const result = await service.create(list.external_id, list.user_id, {
+      title: "Leite",
+    });
 
     expect(result.title).toBe("Leite");
   });
 
   it("forbids item creation for non-owner", async () => {
-    todoListService.getListForWrite.mockRejectedValue(
-      new ForbiddenException(),
-    );
+    todoListService.getListForWrite.mockRejectedValue(new ForbiddenException());
 
     await expect(
       service.create(

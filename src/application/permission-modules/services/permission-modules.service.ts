@@ -37,10 +37,7 @@ export class PermissionModulesService implements PermissionModulesServicePort {
     private readonly moduleQueryRepository: ModuleQueryRepositoryPort,
   ) {}
 
-  async listByPermissionId(
-    permissionId: string,
-    query: PaginationQueryDto,
-  ) {
+  async listByPermissionId(permissionId: string, query: PaginationQueryDto) {
     await this.ensurePermissionExists(permissionId);
     const pagination = parsePaginationQuery(query);
     const { items: links, total } =
@@ -51,7 +48,9 @@ export class PermissionModulesService implements PermissionModulesServicePort {
       );
     const modules = await this.resolveModulesFromLinks(links);
     return toPaginatedResponse(
-      modules.map((moduleEntity) => toPermissionModuleResponseDto(moduleEntity)),
+      modules.map((moduleEntity) =>
+        toPermissionModuleResponseDto(moduleEntity),
+      ),
       total,
       pagination,
     );
@@ -138,9 +137,7 @@ export class PermissionModulesService implements PermissionModulesServicePort {
     );
   }
 
-  private async resolveModulesFromLinks(
-    links: { module_id: string }[],
-  ) {
+  private async resolveModulesFromLinks(links: { module_id: string }[]) {
     const moduleIds = links.map((link) => link.module_id);
 
     if (!moduleIds.length) {

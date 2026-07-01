@@ -18,7 +18,10 @@ export interface TodoListServicePort {
     query: PaginationQueryDto,
   ): Promise<PaginatedResponseDto<TodoListResponseDto>>;
   findById(listId: string, userId: string): Promise<TodoListResponseDto>;
-  create(userId: string, payload: CreateTodoListDto): Promise<TodoListResponseDto>;
+  create(
+    userId: string,
+    payload: CreateTodoListDto,
+  ): Promise<TodoListResponseDto>;
   update(
     listId: string,
     userId: string,

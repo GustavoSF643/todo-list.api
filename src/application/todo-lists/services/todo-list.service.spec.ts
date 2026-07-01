@@ -1,7 +1,4 @@
-import {
-  ForbiddenException,
-  NotFoundException,
-} from "@nestjs/common";
+import { ForbiddenException, NotFoundException } from "@nestjs/common";
 import { Test, TestingModule } from "@nestjs/testing";
 
 import { TODO_ITEM_REPOSITORY } from "@application/todo-items/tokens/injection-tokens";
@@ -65,9 +62,12 @@ describe("TodoListService", () => {
     todoListRepository.create.mockReturnValue(created);
     todoListRepository.save.mockResolvedValue(created);
 
-    const result = await service.create("11111111-1111-4111-8111-111111111111", {
-      title: "Compras",
-    });
+    const result = await service.create(
+      "11111111-1111-4111-8111-111111111111",
+      {
+        title: "Compras",
+      },
+    );
 
     expect(todoListRepository.create).toHaveBeenCalledWith({
       user_id: "11111111-1111-4111-8111-111111111111",
@@ -133,7 +133,10 @@ describe("TodoListService", () => {
 
   it("allows non-owner to read public list", async () => {
     todoListRepository.findByExternalId.mockResolvedValue(
-      makeList({ is_public: true, user_id: "22222222-2222-4222-8222-222222222222" }),
+      makeList({
+        is_public: true,
+        user_id: "22222222-2222-4222-8222-222222222222",
+      }),
     );
 
     const result = await service.findById(
@@ -146,7 +149,10 @@ describe("TodoListService", () => {
 
   it("forbids non-owner from updating list", async () => {
     todoListRepository.findByExternalId.mockResolvedValue(
-      makeList({ user_id: "22222222-2222-4222-8222-222222222222", is_public: true }),
+      makeList({
+        user_id: "22222222-2222-4222-8222-222222222222",
+        is_public: true,
+      }),
     );
 
     await expect(

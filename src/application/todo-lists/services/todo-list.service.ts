@@ -34,11 +34,12 @@ export class TodoListService implements TodoListServicePort {
 
   async findMine(userId: string, query: PaginationQueryDto) {
     const pagination = parsePaginationQuery(query);
-    const { items, total } = await this.todoListRepository.findByUserIdPaginated(
-      userId,
-      pagination.skip,
-      pagination.take,
-    );
+    const { items, total } =
+      await this.todoListRepository.findByUserIdPaginated(
+        userId,
+        pagination.skip,
+        pagination.take,
+      );
     return toPaginatedResponse(
       items.map((list) => toTodoListResponseDto(list)),
       total,
@@ -55,9 +56,7 @@ export class TodoListService implements TodoListServicePort {
         pagination.take,
       );
     return toPaginatedResponse(
-      items.map((list) =>
-        toTodoListResponseDto(list, { includeOwner: true }),
-      ),
+      items.map((list) => toTodoListResponseDto(list, { includeOwner: true })),
       total,
       pagination,
     );

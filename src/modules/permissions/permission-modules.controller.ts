@@ -54,7 +54,10 @@ export class PermissionModulesController {
     @Param("permissionId", ParseUUIDPipe) permissionId: string,
     @Query() query: PaginationQueryDto,
   ) {
-    return this.permissionModulesService.listByPermissionId(permissionId, query);
+    return this.permissionModulesService.listByPermissionId(
+      permissionId,
+      query,
+    );
   }
 
   @Put()

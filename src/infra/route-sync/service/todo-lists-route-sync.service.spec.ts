@@ -1,10 +1,4 @@
-import {
-  Delete,
-  Get,
-  Patch,
-  Post,
-  Controller,
-} from "@nestjs/common";
+import { Delete, Get, Patch, Post, Controller } from "@nestjs/common";
 import { DiscoveryModule } from "@nestjs/core";
 import { Test, TestingModule } from "@nestjs/testing";
 
@@ -61,7 +55,10 @@ describe("RouteSyncService (todo-lists)", () => {
 
     const module: TestingModule = await Test.createTestingModule({
       imports: [DiscoveryModule],
-      controllers: [TodoListsRoutesProbeController, TodoItemsRoutesProbeController],
+      controllers: [
+        TodoListsRoutesProbeController,
+        TodoItemsRoutesProbeController,
+      ],
       providers: [
         RouteSyncService,
         { provide: TypeOrmRouteRepository, useValue: routeRepository },

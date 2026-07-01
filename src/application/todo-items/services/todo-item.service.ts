@@ -82,7 +82,8 @@ export class TodoItemService implements TodoItemServicePort {
   async remove(listId: string, itemId: string, userId: string): Promise<void> {
     await this.todoListService.getListForWrite(listId, userId);
     await this.getItemInList(listId, itemId);
-    const deleted = await this.todoItemRepository.softDeleteByExternalId(itemId);
+    const deleted =
+      await this.todoItemRepository.softDeleteByExternalId(itemId);
 
     if (!deleted) {
       throw new NotFoundException("Item de tarefa não encontrado.");
