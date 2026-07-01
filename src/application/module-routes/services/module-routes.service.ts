@@ -9,6 +9,11 @@ import {
   MODULE_REPOSITORY,
   type ModuleRepositoryPort,
 } from "@application/modules";
+import {
+  parsePaginationQuery,
+  toPaginatedResponse,
+  type PaginationQueryDto,
+} from "@application/common/pagination";
 import { AddModuleRoutesDto } from "../dto/add-module-routes.dto";
 import { ModuleRouteResponseDto } from "../dto/module-route-response.dto";
 import { SyncModuleRoutesDto } from "../dto/sync-module-routes.dto";
@@ -32,10 +37,21 @@ export class ModuleRoutesService implements ModuleRoutesServicePort {
     private readonly routeQueryRepository: RouteQueryRepositoryPort,
   ) {}
 
-  async listByModuleId(moduleId: string): Promise<ModuleRouteResponseDto[]> {
+  async listByModuleId(moduleId: string, query: PaginationQueryDto) {
     await this.ensureModuleExists(moduleId);
-    const routes = await this.findRoutesByModuleId(moduleId);
-    return routes.map((route) => toModuleRouteResponseDto(route));
+    const pagination = parsePaginationQuery(query);
+    const { items: links, total } =
+      await this.moduleRouteRepository.findActiveByModuleIdPaginated(
+        moduleId,
+        pagination.skip,
+        pagination.take,
+      );
+    const routes = await this.resolveRoutesFromLinks(links);
+    return toPaginatedResponse(
+      routes.map((route) => toModuleRouteResponseDto(route)),
+      total,
+      pagination,
+    );
   }
 
   async sync(
@@ -51,7 +67,7 @@ export class ModuleRoutesService implements ModuleRoutesServicePort {
       await this.linkRoute(moduleId, routeId);
     }
 
-    return this.listByModuleId(moduleId);
+    return this.listAllByModuleId(moduleId);
   }
 
   async add(
@@ -65,7 +81,7 @@ export class ModuleRoutesService implements ModuleRoutesServicePort {
       await this.linkRoute(moduleId, routeId);
     }
 
-    return this.listByModuleId(moduleId);
+    return this.listAllByModuleId(moduleId);
   }
 
   async remove(moduleId: string, routeId: string): Promise<void> {
@@ -102,6 +118,31 @@ export class ModuleRoutesService implements ModuleRoutesServicePort {
     if (existing.deleted_at) {
       await this.moduleRouteRepository.restore(existing);
     }
+  }
+
+  private async listAllByModuleId(
+    moduleId: string,
+  ): Promise<ModuleRouteResponseDto[]> {
+    const routes = await this.findRoutesByModuleId(moduleId);
+    return routes.map((route) => toModuleRouteResponseDto(route));
+  }
+
+  private async resolveRoutesFromLinks(links: { route_id: string }[]) {
+    const routeIds = links.map((link) => link.route_id);
+
+    if (!routeIds.length) {
+      return [];
+    }
+
+    const routes =
+      await this.routeQueryRepository.findActiveByExternalIds(routeIds);
+    const routeById = new Map(
+      routes.map((route) => [route.external_id, route]),
+    );
+
+    return routeIds
+      .map((routeId) => routeById.get(routeId))
+      .filter((route) => route !== undefined);
   }
 
   private async findRoutesByModuleId(moduleId: string) {

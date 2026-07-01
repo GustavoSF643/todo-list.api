@@ -37,7 +37,7 @@ describe("ModuleRoutesService", () => {
       findByExternalId: jest.fn(),
       findByName: jest.fn(),
       findByModuleKey: jest.fn(),
-      findAll: jest.fn(),
+      findAllPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),
@@ -46,6 +46,7 @@ describe("ModuleRoutesService", () => {
 
     moduleRouteRepository = {
       findActiveByModuleId: jest.fn(),
+      findActiveByModuleIdPaginated: jest.fn(),
       findByModuleIdAndRouteId: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
@@ -72,17 +73,18 @@ describe("ModuleRoutesService", () => {
 
   it("lists routes linked to module", async () => {
     moduleRepository.findByExternalId.mockResolvedValue({} as never);
-    moduleRouteRepository.findActiveByModuleId.mockResolvedValue([
-      { route_id: ROUTE_A } as ModuleRouteEntity,
-    ]);
+    moduleRouteRepository.findActiveByModuleIdPaginated.mockResolvedValue({
+      items: [{ route_id: ROUTE_A } as ModuleRouteEntity],
+      total: 1,
+    });
     routeQueryRepository.findActiveByExternalIds.mockResolvedValue([
       makeRoute(ROUTE_A),
     ]);
 
-    const result = await service.listByModuleId(MODULE_ID);
+    const result = await service.listByModuleId(MODULE_ID, {});
 
-    expect(result).toHaveLength(1);
-    expect(result[0].id).toBe(ROUTE_A);
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].id).toBe(ROUTE_A);
   });
 
   it("sync replaces module route links", async () => {

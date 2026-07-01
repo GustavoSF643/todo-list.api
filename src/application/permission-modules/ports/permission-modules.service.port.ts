@@ -1,3 +1,8 @@
+import type {
+  PaginatedResponseDto,
+  PaginationQueryDto,
+} from "@application/common/pagination";
+
 import { AddPermissionModulesDto } from "../dto/add-permission-modules.dto";
 import { PermissionModuleResponseDto } from "../dto/permission-module-response.dto";
 import { SyncPermissionModulesDto } from "../dto/sync-permission-modules.dto";
@@ -5,7 +10,8 @@ import { SyncPermissionModulesDto } from "../dto/sync-permission-modules.dto";
 export interface PermissionModulesServicePort {
   listByPermissionId(
     permissionId: string,
-  ): Promise<PermissionModuleResponseDto[]>;
+    query: PaginationQueryDto,
+  ): Promise<PaginatedResponseDto<PermissionModuleResponseDto>>;
   sync(
     permissionId: string,
     payload: SyncPermissionModulesDto,

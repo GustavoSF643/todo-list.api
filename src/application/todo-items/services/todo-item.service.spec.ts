@@ -44,7 +44,7 @@ describe("TodoItemService", () => {
   beforeEach(async () => {
     todoItemRepository = {
       findByExternalId: jest.fn(),
-      findByTodoListId: jest.fn(),
+      findByTodoListIdPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),
@@ -75,15 +75,19 @@ describe("TodoItemService", () => {
 
   it("lists items when user can read list", async () => {
     todoListService.getListForRead.mockResolvedValue(makeList());
-    todoItemRepository.findByTodoListId.mockResolvedValue([makeItem()]);
+    todoItemRepository.findByTodoListIdPaginated.mockResolvedValue({
+      items: [makeItem()],
+      total: 1,
+    });
 
     const result = await service.findByListId(
       "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       "11111111-1111-4111-8111-111111111111",
+      {},
     );
 
-    expect(result).toHaveLength(1);
-    expect(result[0].title).toBe("Leite");
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].title).toBe("Leite");
   });
 
   it("creates item for list owner", async () => {
@@ -123,6 +127,7 @@ describe("TodoItemService", () => {
       service.findByListId(
         "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
         "22222222-2222-4222-8222-222222222222",
+        {},
       ),
     ).rejects.toBeInstanceOf(NotFoundException);
   });

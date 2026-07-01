@@ -1,8 +1,13 @@
+import type { PaginatedResult } from "@application/common/pagination";
 import type { TodoItemEntity } from "@infra/database/entities/todo-item.entity";
 
 export interface TodoItemRepositoryPort {
   findByExternalId(externalId: string): Promise<TodoItemEntity | null>;
-  findByTodoListId(todoListId: string): Promise<TodoItemEntity[]>;
+  findByTodoListIdPaginated(
+    todoListId: string,
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<TodoItemEntity>>;
   save(todoItem: TodoItemEntity): Promise<TodoItemEntity>;
   create(data: Partial<TodoItemEntity>): TodoItemEntity;
   merge(

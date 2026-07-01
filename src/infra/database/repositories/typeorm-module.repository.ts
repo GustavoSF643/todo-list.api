@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
+import type { PaginatedResult } from "@application/common/pagination";
 import type { ModuleRepositoryPort } from "@application/modules";
 import { ModuleEntity } from "../entities/module.entity";
 
@@ -24,8 +25,12 @@ export class TypeOrmModuleRepository implements ModuleRepositoryPort {
     return this.repository.findOne({ where: { module_key: moduleKey } });
   }
 
-  findAll(): Promise<ModuleEntity[]> {
-    return this.repository.find();
+  async findAllPaginated(
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<ModuleEntity>> {
+    const [items, total] = await this.repository.findAndCount({ skip, take });
+    return { items, total };
   }
 
   save(moduleEntity: ModuleEntity): Promise<ModuleEntity> {

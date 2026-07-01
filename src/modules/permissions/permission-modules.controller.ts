@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -20,6 +21,11 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import {
+  ApiPaginatedOkResponse,
+  ApiPaginationQuery,
+  PaginationQueryDto,
+} from "@application/common/pagination";
 import {
   AddPermissionModulesDto,
   PERMISSION_MODULES_SERVICE,
@@ -42,11 +48,13 @@ export class PermissionModulesController {
 
   @Get()
   @ApiOperation({ summary: "Listar módulos vinculados à permissão" })
-  @ApiOkResponse({ type: PermissionModuleResponseDto, isArray: true })
+  @ApiPaginationQuery()
+  @ApiPaginatedOkResponse(PermissionModuleResponseDto)
   list(
     @Param("permissionId", ParseUUIDPipe) permissionId: string,
-  ): Promise<PermissionModuleResponseDto[]> {
-    return this.permissionModulesService.listByPermissionId(permissionId);
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.permissionModulesService.listByPermissionId(permissionId, query);
   }
 
   @Put()

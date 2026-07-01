@@ -14,6 +14,7 @@ import {
   E2E_USER_ID,
 } from "../support/fixtures/e2e-fixtures";
 import { bearer } from "../support/http/bearer";
+import { paginatedResponse } from "../support/http/paginated-response";
 
 describe("Todo Lists (e2e)", () => {
   let app: INestApplication<App>;
@@ -56,6 +57,56 @@ describe("Todo Lists (e2e)", () => {
     return request(app.getHttpServer()).get("/todo-lists").expect(401);
   });
 
+  it("GET /todo-lists returns paginated owner lists", async () => {
+    todoListService.findMine.mockResolvedValue(
+      paginatedResponse([
+        {
+          id: E2E_TODO_LIST_ID,
+          user_id: E2E_USER_ID,
+          title: "Minha lista",
+          is_public: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ]),
+    );
+
+    const response = await request(app.getHttpServer())
+      .get("/todo-lists")
+      .set(bearer())
+      .expect(200);
+
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.meta.page).toBe(1);
+    expect(todoListService.findMine).toHaveBeenCalledWith(E2E_USER_ID, {});
+  });
+
+  it("GET /todo-lists/public returns paginated public lists", async () => {
+    todoListService.findPublic.mockResolvedValue(
+      paginatedResponse([
+        {
+          id: E2E_TODO_LIST_ID,
+          user_id: "22222222-2222-4222-8222-222222222222",
+          title: "Pública",
+          is_public: true,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ]),
+    );
+
+    const response = await request(app.getHttpServer())
+      .get("/todo-lists/public?page=1&limit=20")
+      .set(bearer())
+      .expect(200);
+
+    expect(response.body.data).toHaveLength(1);
+    expect(todoListService.findPublic).toHaveBeenCalledWith(E2E_USER_ID, {
+      page: 1,
+      limit: 20,
+    });
+  });
+
   it("owner creates private list and lists items", async () => {
     todoListService.create.mockResolvedValue({
       id: E2E_TODO_LIST_ID,
@@ -65,17 +116,19 @@ describe("Todo Lists (e2e)", () => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     });
-    todoItemService.findByListId.mockResolvedValue([
-      {
-        id: E2E_TODO_ITEM_ID,
-        todo_list_id: E2E_TODO_LIST_ID,
-        title: "Leite",
-        completed: false,
-        position: 0,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ]);
+    todoItemService.findByListId.mockResolvedValue(
+      paginatedResponse([
+        {
+          id: E2E_TODO_ITEM_ID,
+          todo_list_id: E2E_TODO_LIST_ID,
+          title: "Leite",
+          completed: false,
+          position: 0,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+      ]),
+    );
 
     const createResponse = await request(app.getHttpServer())
       .post("/todo-lists")
@@ -93,10 +146,11 @@ describe("Todo Lists (e2e)", () => {
       .set(bearer())
       .expect(200);
 
-    expect(itemsResponse.body).toHaveLength(1);
+    expect(itemsResponse.body.data).toHaveLength(1);
     expect(todoItemService.findByListId).toHaveBeenCalledWith(
       E2E_TODO_LIST_ID,
       E2E_USER_ID,
+      {},
     );
   });
 
@@ -122,7 +176,7 @@ describe("Todo Lists (e2e)", () => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     });
-    todoItemService.findByListId.mockResolvedValue([]);
+    todoItemService.findByListId.mockResolvedValue(paginatedResponse([]));
 
     await request(app.getHttpServer())
       .patch(`/todo-lists/${E2E_TODO_LIST_ID}`)

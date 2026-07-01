@@ -76,6 +76,30 @@ pnpm run migration:revert
 | `permission-modules` | `/permissions/:permissionId/modules` | JWT |
 | `todo-lists` | `/todo-lists` | JWT |
 
+### Paginação em listagens (breaking change)
+
+Todos os endpoints `GET` que retornam coleções usam o envelope `{ data, meta }` em vez de um array na raiz.
+
+| Query | Padrão | Regra |
+|-------|--------|-------|
+| `page` | `1` | Inteiro ≥ 1; inválido → `400` |
+| `limit` | `20` | Inteiro ≥ 1; valores acima de `100` são limitados a `100` (sem erro) |
+
+`meta`: `{ page, limit, total, total_pages }`.
+
+Endpoints paginados:
+
+- `GET /users`
+- `GET /permissions`
+- `GET /modules`
+- `GET /permissions/:permissionId/modules`
+- `GET /modules/:moduleId/routes`
+- `GET /todo-lists`
+- `GET /todo-lists/public`
+- `GET /todo-lists/:listId/items`
+
+`PUT`/`POST` de vínculos (`/permissions/:id/modules`, `/modules/:id/routes`) continuam retornando array completo após sync/add.
+
 ### Módulos sugeridos (todo-lists)
 
 | module_key | Rotas |
@@ -107,6 +131,7 @@ Detalhes de payloads e schemas: Swagger em `/api`.
 ```text
 src/
   application/           # regras de negócio por contexto
+    common/pagination/   # DTOs e helpers de paginação
     auth/                # password hasher, JWT payload
     users/               # usuários, validação de senha, 2FA
     sessions/            # login e emissão de token

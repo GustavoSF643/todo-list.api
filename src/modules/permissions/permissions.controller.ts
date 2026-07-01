@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -19,6 +20,11 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import {
+  ApiPaginatedOkResponse,
+  ApiPaginationQuery,
+  PaginationQueryDto,
+} from "@application/common/pagination";
 import {
   CreatePermissionDto,
   PERMISSION_SERVICE,
@@ -48,9 +54,10 @@ export class PermissionsController {
 
   @Get()
   @ApiOperation({ summary: "Listar permissões" })
-  @ApiOkResponse({ type: PermissionResponseDto, isArray: true })
-  findAll(): Promise<PermissionResponseDto[]> {
-    return this.permissionService.findAll();
+  @ApiPaginationQuery()
+  @ApiPaginatedOkResponse(PermissionResponseDto)
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.permissionService.findAll(query);
   }
 
   @Get(":id")

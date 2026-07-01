@@ -1,7 +1,13 @@
+import type { PaginatedResult } from "@application/common/pagination";
 import type { ModuleRouteEntity } from "@infra/database/entities/module-route.entity";
 
 export interface ModuleRouteRepositoryPort {
   findActiveByModuleId(moduleId: string): Promise<ModuleRouteEntity[]>;
+  findActiveByModuleIdPaginated(
+    moduleId: string,
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<ModuleRouteEntity>>;
   findByModuleIdAndRouteId(
     moduleId: string,
     routeId: string,

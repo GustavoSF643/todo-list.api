@@ -5,6 +5,12 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 
+import {
+  parsePaginationQuery,
+  toPaginatedResponse,
+  type PaginationQueryDto,
+} from "@application/common/pagination";
+
 import { TODO_ITEM_REPOSITORY } from "@application/todo-items/tokens/injection-tokens";
 import type { TodoItemRepositoryPort } from "@application/todo-items/ports/todo-item.repository.port";
 import type { TodoListEntity } from "@infra/database/entities/todo-list.entity";
@@ -26,16 +32,34 @@ export class TodoListService implements TodoListServicePort {
     private readonly todoItemRepository: TodoItemRepositoryPort,
   ) {}
 
-  async findMine(userId: string): Promise<TodoListResponseDto[]> {
-    const lists = await this.todoListRepository.findByUserId(userId);
-    return lists.map((list) => toTodoListResponseDto(list));
+  async findMine(userId: string, query: PaginationQueryDto) {
+    const pagination = parsePaginationQuery(query);
+    const { items, total } = await this.todoListRepository.findByUserIdPaginated(
+      userId,
+      pagination.skip,
+      pagination.take,
+    );
+    return toPaginatedResponse(
+      items.map((list) => toTodoListResponseDto(list)),
+      total,
+      pagination,
+    );
   }
 
-  async findPublic(userId: string): Promise<TodoListResponseDto[]> {
-    const lists =
-      await this.todoListRepository.findPublicExcludingUserId(userId);
-    return lists.map((list) =>
-      toTodoListResponseDto(list, { includeOwner: true }),
+  async findPublic(userId: string, query: PaginationQueryDto) {
+    const pagination = parsePaginationQuery(query);
+    const { items, total } =
+      await this.todoListRepository.findPublicExcludingUserIdPaginated(
+        userId,
+        pagination.skip,
+        pagination.take,
+      );
+    return toPaginatedResponse(
+      items.map((list) =>
+        toTodoListResponseDto(list, { includeOwner: true }),
+      ),
+      total,
+      pagination,
     );
   }
 

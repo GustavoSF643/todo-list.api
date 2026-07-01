@@ -5,6 +5,12 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 
+import {
+  parsePaginationQuery,
+  toPaginatedResponse,
+  type PaginationQueryDto,
+} from "@application/common/pagination";
+
 import { CreateModuleDto } from "../dto/create-module.dto";
 import { ModuleResponseDto } from "../dto/module-response.dto";
 import { UpdateModuleDto } from "../dto/update-module.dto";
@@ -29,9 +35,17 @@ export class ModuleService implements ModuleServicePort {
     return toModuleResponseDto(createdModule);
   }
 
-  async findAll(): Promise<ModuleResponseDto[]> {
-    const modules = await this.moduleRepository.findAll();
-    return modules.map((moduleEntity) => toModuleResponseDto(moduleEntity));
+  async findAll(query: PaginationQueryDto) {
+    const pagination = parsePaginationQuery(query);
+    const { items, total } = await this.moduleRepository.findAllPaginated(
+      pagination.skip,
+      pagination.take,
+    );
+    return toPaginatedResponse(
+      items.map((moduleEntity) => toModuleResponseDto(moduleEntity)),
+      total,
+      pagination,
+    );
   }
 
   async findByExternalId(externalId: string): Promise<ModuleResponseDto> {

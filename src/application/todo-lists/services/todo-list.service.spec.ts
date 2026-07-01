@@ -32,8 +32,8 @@ describe("TodoListService", () => {
   beforeEach(async () => {
     todoListRepository = {
       findByExternalId: jest.fn(),
-      findByUserId: jest.fn(),
-      findPublicExcludingUserId: jest.fn(),
+      findByUserIdPaginated: jest.fn(),
+      findPublicExcludingUserIdPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),
@@ -41,7 +41,7 @@ describe("TodoListService", () => {
     };
     todoItemRepository = {
       findByExternalId: jest.fn(),
-      findByTodoListId: jest.fn(),
+      findByTodoListIdPaginated: jest.fn(),
       save: jest.fn(),
       create: jest.fn(),
       merge: jest.fn(),
@@ -76,6 +76,46 @@ describe("TodoListService", () => {
       is_public: false,
     });
     expect(result.title).toBe("Compras");
+  });
+
+  it("returns paginated lists for owner", async () => {
+    const list = makeList();
+    todoListRepository.findByUserIdPaginated.mockResolvedValue({
+      items: [list],
+      total: 1,
+    });
+
+    const result = await service.findMine(
+      "11111111-1111-4111-8111-111111111111",
+      { page: 1, limit: 10 },
+    );
+
+    expect(todoListRepository.findByUserIdPaginated).toHaveBeenCalledWith(
+      "11111111-1111-4111-8111-111111111111",
+      0,
+      10,
+    );
+    expect(result.data).toHaveLength(1);
+    expect(result.meta.total).toBe(1);
+  });
+
+  it("returns paginated public lists excluding requester", async () => {
+    const list = makeList({
+      is_public: true,
+      user_id: "22222222-2222-4222-8222-222222222222",
+    });
+    todoListRepository.findPublicExcludingUserIdPaginated.mockResolvedValue({
+      items: [list],
+      total: 1,
+    });
+
+    const result = await service.findPublic(
+      "11111111-1111-4111-8111-111111111111",
+      {},
+    );
+
+    expect(result.data).toHaveLength(1);
+    expect(result.data[0].is_public).toBe(true);
   });
 
   it("returns 404 when non-owner reads private list", async () => {

@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { IsNull, Repository } from "typeorm";
 
+import type { PaginatedResult } from "@application/common/pagination";
 import type { PermissionModuleRepositoryPort } from "@application/permission-modules";
 import { PermissionModuleEntity } from "../entities/permission-module.entity";
 
@@ -20,6 +21,19 @@ export class TypeOrmPermissionModuleRepository
     return this.repository.find({
       where: { permission_id: permissionId, deleted_at: IsNull() },
     });
+  }
+
+  async findActiveByPermissionIdPaginated(
+    permissionId: string,
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<PermissionModuleEntity>> {
+    const [items, total] = await this.repository.findAndCount({
+      where: { permission_id: permissionId, deleted_at: IsNull() },
+      skip,
+      take,
+    });
+    return { items, total };
   }
 
   findByPermissionIdAndModuleId(

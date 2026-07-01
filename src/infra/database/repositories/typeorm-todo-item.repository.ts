@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
+import type { PaginatedResult } from "@application/common/pagination";
 import type { TodoItemRepositoryPort } from "@application/todo-items";
 import { TodoItemEntity } from "../entities/todo-item.entity";
 
@@ -16,11 +17,18 @@ export class TypeOrmTodoItemRepository implements TodoItemRepositoryPort {
     return this.repository.findOne({ where: { external_id: externalId } });
   }
 
-  findByTodoListId(todoListId: string): Promise<TodoItemEntity[]> {
-    return this.repository.find({
+  async findByTodoListIdPaginated(
+    todoListId: string,
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<TodoItemEntity>> {
+    const [items, total] = await this.repository.findAndCount({
       where: { todo_list_id: todoListId },
       order: { position: "ASC", created_at: "ASC" },
+      skip,
+      take,
     });
+    return { items, total };
   }
 
   save(todoItem: TodoItemEntity): Promise<TodoItemEntity> {

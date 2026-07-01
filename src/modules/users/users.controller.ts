@@ -8,6 +8,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -18,6 +19,11 @@ import {
   ApiOperation,
   ApiTags,
 } from "@nestjs/swagger";
+import {
+  ApiPaginatedOkResponse,
+  ApiPaginationQuery,
+  PaginationQueryDto,
+} from "@application/common/pagination";
 import {
   CreateUserDto,
   UpdateUserDto,
@@ -49,9 +55,10 @@ export class UsersController {
   @Get()
   @ApiBearerAuth("access-token")
   @ApiOperation({ summary: "Listar usuários" })
-  @ApiOkResponse({ type: UserResponseDto, isArray: true })
-  findAll(): Promise<UserResponseDto[]> {
-    return this.userService.findAll();
+  @ApiPaginationQuery()
+  @ApiPaginatedOkResponse(UserResponseDto)
+  findAll(@Query() query: PaginationQueryDto) {
+    return this.userService.findAll(query);
   }
 
   @Get(":id")

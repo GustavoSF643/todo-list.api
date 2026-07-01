@@ -14,12 +14,14 @@ flowchart LR
   API --> Modules["/modules"]
   API --> ModuleRoutes["/modules/:moduleId/routes"]
   API --> PermissionModules["/permissions/:permissionId/modules"]
+  API --> TodoLists["/todo-lists"]
   Sessions --> JWT[JWT]
   Users --> JWT
   Permissions --> JWT
   Modules --> JWT
   ModuleRoutes --> JWT
   PermissionModules --> JWT
+  TodoLists --> JWT
   API --> Postgres[(PostgreSQL)]
   API --> Redis[(Redis opcional)]
 ```
@@ -59,6 +61,7 @@ flowchart TB
   end
 
   subgraph application [application/]
+    PaginationCtx[common/pagination]
     AuthCtx[auth]
     UsersCtx[users]
     SessionsCtx[sessions]
@@ -66,6 +69,8 @@ flowchart TB
     ModulesCtx[modules]
     ModuleRoutesCtx[module-routes]
     PermissionModulesCtx[permission-modules]
+    TodoListsCtx[todo-lists]
+    TodoItemsCtx[todo-items]
   end
 
   subgraph infra [infra/]
@@ -89,12 +94,16 @@ flowchart TB
 | `modules` | `ModuleService` | `/modules` |
 | `module-routes` | `ModuleRoutesService` | `/modules/:moduleId/routes` |
 | `permission-modules` | `PermissionModulesService` | `/permissions/:permissionId/modules` |
+| `todo-lists` | `TodoListService` | `/todo-lists` |
+| `todo-items` | `TodoItemService` | `/todo-lists/:listId/items` |
+
+Listagens paginadas (`GET` em coleções) usam `common/pagination` para query params e envelope `{ data, meta }`.
 
 `AuthModule` concentra JWT, `JwtAuthGuard`, `PasswordHasher` e repositório de usuários usado no login.
 
 ## Infraestrutura de dados
 
-- Entities: `module`, `route`, `permission`, `user`, `module_route`, `permission_module`
+- Entities: `module`, `route`, `permission`, `user`, `module_route`, `permission_module`, `todo_list`, `todo_item`
 - Migrations via TypeORM CLI (`data-source.ts`)
 - Logs do ORM desabilitados (`logging: false`)
 - `synchronize: false` — schema apenas via migrations

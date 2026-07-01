@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -22,6 +23,11 @@ import {
 } from "@nestjs/swagger";
 
 import type { JwtPayload } from "@application/auth";
+import {
+  ApiPaginatedOkResponse,
+  ApiPaginationQuery,
+  PaginationQueryDto,
+} from "@application/common/pagination";
 import {
   CreateTodoItemDto,
   TODO_ITEM_SERVICE,
@@ -45,12 +51,14 @@ export class TodoItemsController {
 
   @Get()
   @ApiOperation({ summary: "Listar itens da lista" })
-  @ApiOkResponse({ type: TodoItemResponseDto, isArray: true })
+  @ApiPaginationQuery()
+  @ApiPaginatedOkResponse(TodoItemResponseDto)
   findByListId(
     @CurrentUser() user: JwtPayload,
     @Param("listId", ParseUUIDPipe) listId: string,
-  ): Promise<TodoItemResponseDto[]> {
-    return this.todoItemService.findByListId(listId, user.sub);
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.todoItemService.findByListId(listId, user.sub, query);
   }
 
   @Post()

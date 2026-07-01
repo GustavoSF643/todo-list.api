@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { IsNull, Repository } from "typeorm";
 
+import type { PaginatedResult } from "@application/common/pagination";
 import type { ModuleRouteRepositoryPort } from "@application/module-routes";
 import { ModuleRouteEntity } from "../entities/module-route.entity";
 
@@ -16,6 +17,19 @@ export class TypeOrmModuleRouteRepository implements ModuleRouteRepositoryPort {
     return this.repository.find({
       where: { module_id: moduleId, deleted_at: IsNull() },
     });
+  }
+
+  async findActiveByModuleIdPaginated(
+    moduleId: string,
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<ModuleRouteEntity>> {
+    const [items, total] = await this.repository.findAndCount({
+      where: { module_id: moduleId, deleted_at: IsNull() },
+      skip,
+      take,
+    });
+    return { items, total };
   }
 
   findByModuleIdAndRouteId(

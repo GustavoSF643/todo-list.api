@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Not, Repository } from "typeorm";
 
+import type { PaginatedResult } from "@application/common/pagination";
 import type { TodoListRepositoryPort } from "@application/todo-lists";
 import { TodoListEntity } from "../entities/todo-list.entity";
 
@@ -19,19 +20,33 @@ export class TypeOrmTodoListRepository implements TodoListRepositoryPort {
     });
   }
 
-  findByUserId(userId: string): Promise<TodoListEntity[]> {
-    return this.repository.find({
+  async findByUserIdPaginated(
+    userId: string,
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<TodoListEntity>> {
+    const [items, total] = await this.repository.findAndCount({
       where: { user_id: userId },
       order: { created_at: "DESC" },
+      skip,
+      take,
     });
+    return { items, total };
   }
 
-  findPublicExcludingUserId(userId: string): Promise<TodoListEntity[]> {
-    return this.repository.find({
+  async findPublicExcludingUserIdPaginated(
+    userId: string,
+    skip: number,
+    take: number,
+  ): Promise<PaginatedResult<TodoListEntity>> {
+    const [items, total] = await this.repository.findAndCount({
       where: { is_public: true, user_id: Not(userId) },
       relations: ["owner"],
       order: { created_at: "DESC" },
+      skip,
+      take,
     });
+    return { items, total };
   }
 
   save(todoList: TodoListEntity): Promise<TodoListEntity> {

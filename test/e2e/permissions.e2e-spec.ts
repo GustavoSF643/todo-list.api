@@ -12,6 +12,7 @@ import {
   E2E_PERMISSION_ADMIN_ID,
 } from "../support/fixtures/e2e-fixtures";
 import { bearer } from "../support/http/bearer";
+import { paginatedResponse } from "../support/http/paginated-response";
 
 describe("Permissions (e2e)", () => {
   let app: INestApplication<App>;
@@ -76,25 +77,57 @@ describe("Permissions (e2e)", () => {
     return request(app.getHttpServer()).get("/permissions").expect(401);
   });
 
+  it("GET /permissions with token returns paginated list", async () => {
+    permissionService.findAll.mockResolvedValue(
+      paginatedResponse(
+        [
+          {
+            id: E2E_PERMISSION_ADMIN_ID,
+            name: "ADMIN",
+            is_active: true,
+            created_at: "2026-01-01T00:00:00.000Z",
+            updated_at: "2026-01-01T00:00:00.000Z",
+          },
+        ],
+        { page: 2, limit: 5, total: 1, total_pages: 1 },
+      ),
+    );
+
+    const response = await request(app.getHttpServer())
+      .get("/permissions?page=2&limit=5")
+      .set(bearer())
+      .expect(200);
+
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.meta).toMatchObject({ page: 2, limit: 5, total: 1 });
+    expect(permissionService.findAll).toHaveBeenCalledWith({
+      page: 2,
+      limit: 5,
+    });
+  });
+
   it("GET /permissions/:id/modules returns linked modules", async () => {
-    permissionModulesService.listByPermissionId.mockResolvedValue([
-      {
-        id: E2E_MODULE_ID,
-        name: "Usuários",
-        description: "Operações relacionadas ao cadastro de usuários",
-        module_key: "USERS",
-        is_active: true,
-      },
-    ]);
+    permissionModulesService.listByPermissionId.mockResolvedValue(
+      paginatedResponse([
+        {
+          id: E2E_MODULE_ID,
+          name: "Usuários",
+          description: "Operações relacionadas ao cadastro de usuários",
+          module_key: "USERS",
+          is_active: true,
+        },
+      ]),
+    );
 
     const response = await request(app.getHttpServer())
       .get(`/permissions/${E2E_PERMISSION_ADMIN_ID}/modules`)
       .set(bearer())
       .expect(200);
 
-    expect(response.body).toHaveLength(1);
+    expect(response.body.data).toHaveLength(1);
     expect(permissionModulesService.listByPermissionId).toHaveBeenCalledWith(
       E2E_PERMISSION_ADMIN_ID,
+      {},
     );
   });
 

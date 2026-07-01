@@ -5,6 +5,11 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 
+import {
+  parsePaginationQuery,
+  toPaginatedResponse,
+  type PaginationQueryDto,
+} from "@application/common/pagination";
 import { TODO_LIST_SERVICE } from "@application/todo-lists/tokens/injection-tokens";
 import type { TodoListServicePort } from "@application/todo-lists/ports/todo-list.service.port";
 
@@ -28,10 +33,21 @@ export class TodoItemService implements TodoItemServicePort {
   async findByListId(
     listId: string,
     userId: string,
-  ): Promise<TodoItemResponseDto[]> {
+    query: PaginationQueryDto,
+  ) {
     await this.todoListService.getListForRead(listId, userId);
-    const items = await this.todoItemRepository.findByTodoListId(listId);
-    return items.map((item) => toTodoItemResponseDto(item));
+    const pagination = parsePaginationQuery(query);
+    const { items, total } =
+      await this.todoItemRepository.findByTodoListIdPaginated(
+        listId,
+        pagination.skip,
+        pagination.take,
+      );
+    return toPaginatedResponse(
+      items.map((item) => toTodoItemResponseDto(item)),
+      total,
+      pagination,
+    );
   }
 
   async create(

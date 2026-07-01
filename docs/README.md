@@ -29,8 +29,21 @@ Com a aplicação rodando:
 | `permission-modules` | Vínculo entre permissão e módulos (`permission_module`) |
 | `todo-lists` | CRUD de listas de tarefas por usuário (`is_public`) |
 | `todo-items` | CRUD de itens aninhados em listas |
+| `common/pagination` | DTOs e helpers compartilhados (`page`/`limit`, envelope `{ data, meta }`) |
 
 Cada contexto expõe DTOs, ports, services e tokens de injeção via `index.ts`.
+
+## Paginação em listagens
+
+Endpoints `GET` que retornam coleções respondem com `{ data, meta }` (não array na raiz).
+
+| Query | Padrão | Regra |
+|-------|--------|-------|
+| `page` | `1` | Inteiro ≥ 1 |
+| `limit` | `20` | Inteiro ≥ 1; máximo efetivo `100` (clamp silencioso) |
+
+`meta`: `{ page, limit, total, total_pages }`. Detalhes e lista completa de rotas: [README do projeto](../README.md#paginação-em-listagens-breaking-change).
+
 
 ## Regra de acesso por módulos
 

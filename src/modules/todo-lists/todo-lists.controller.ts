@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -22,6 +23,11 @@ import {
 } from "@nestjs/swagger";
 
 import type { JwtPayload } from "@application/auth";
+import {
+  ApiPaginatedOkResponse,
+  ApiPaginationQuery,
+  PaginationQueryDto,
+} from "@application/common/pagination";
 import {
   CreateTodoListDto,
   TODO_LIST_SERVICE,
@@ -45,16 +51,24 @@ export class TodoListsController {
 
   @Get()
   @ApiOperation({ summary: "Listar minhas listas de tarefas" })
-  @ApiOkResponse({ type: TodoListResponseDto, isArray: true })
-  findMine(@CurrentUser() user: JwtPayload): Promise<TodoListResponseDto[]> {
-    return this.todoListService.findMine(user.sub);
+  @ApiPaginationQuery()
+  @ApiPaginatedOkResponse(TodoListResponseDto)
+  findMine(
+    @CurrentUser() user: JwtPayload,
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.todoListService.findMine(user.sub, query);
   }
 
   @Get("public")
   @ApiOperation({ summary: "Listar listas públicas de outros usuários" })
-  @ApiOkResponse({ type: TodoListResponseDto, isArray: true })
-  findPublic(@CurrentUser() user: JwtPayload): Promise<TodoListResponseDto[]> {
-    return this.todoListService.findPublic(user.sub);
+  @ApiPaginationQuery()
+  @ApiPaginatedOkResponse(TodoListResponseDto)
+  findPublic(
+    @CurrentUser() user: JwtPayload,
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.todoListService.findPublic(user.sub, query);
   }
 
   @Post()
