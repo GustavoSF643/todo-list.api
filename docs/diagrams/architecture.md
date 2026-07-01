@@ -1,6 +1,6 @@
 # Diagrama de arquitetura
 
-Visão geral da **permissions.api**: API REST com auth JWT, RBAC (permissão → módulo → rota), CRUD de usuários/permissões e todo-lists com regras de visibilidade.
+Visão geral da **Todo Lists API** (`permissions.api`): domínio de todo-lists (private/public, itens aninhados) com auth JWT e RBAC (permissão → módulo → rota).
 
 ## Fluxo HTTP
 
@@ -88,14 +88,14 @@ flowchart TB
 
 | Contexto | Service | Rotas |
 |----------|---------|-------|
+| `todo-lists` | `TodoListService` | `/todo-lists` |
+| `todo-items` | `TodoItemService` | `/todo-lists/:listId/items` |
 | `sessions` | `SessionService` | `POST /sessions` |
 | `users` | `UserService` | `/users` |
 | `permissions` | `PermissionService` | `/permissions` |
 | `modules` | `ModuleService` | `/modules` |
 | `module-routes` | `ModuleRoutesService` | `/modules/:moduleId/routes` |
 | `permission-modules` | `PermissionModulesService` | `/permissions/:permissionId/modules` |
-| `todo-lists` | `TodoListService` | `/todo-lists` |
-| `todo-items` | `TodoItemService` | `/todo-lists/:listId/items` |
 
 Listagens paginadas (`GET` em coleções) usam `common/pagination` para query params e envelope `{ data, meta }`.
 

@@ -1,12 +1,14 @@
-# Permissions API — Auth, RBAC & Todo Lists
+# Todo Lists API — Auth & RBAC
 
-API REST em **NestJS** para autenticação JWT, autorização por módulos/rotas (RBAC), gestão de usuários e permissões, e domínio de **todo-lists** com visibilidade private/public. Projeto de portfólio com arquitetura em camadas, TypeORM, PostgreSQL, testes e documentação OpenAPI.
+API REST em **NestJS** para **listas de tarefas** com itens aninhados, visibilidade private/public e regras de owner. Inclui autenticação JWT, autorização por módulos/rotas (RBAC) e gestão de usuários/permissões como base de acesso. Projeto de portfólio com arquitetura em camadas, TypeORM, PostgreSQL, testes e documentação OpenAPI.
+
+> Repositório: `permissions.api` (nome histórico do template de permissões; o domínio principal é **todo-lists**).
 
 ## O que este projeto demonstra
 
+- **Todo-lists (domínio principal):** listas por usuário, itens aninhados, listas públicas/privadas, regras de leitura/escrita por owner
 - **Autenticação:** login (`POST /sessions`), JWT, hash de senha (Scrypt), suporte a 2FA (TOTP via `otplib`)
 - **Autorização (RBAC):** permissões → módulos → rotas; `PermissionsGuard` valida `method + path` por usuário
-- **Domínio de negócio:** todo-lists e todo-items com owner, listas públicas/privadas e regras de leitura/escrita
 - **API design:** paginação padronizada (`{ data, meta }`), DTOs com `class-validator`, Swagger em `/api`
 - **Arquitetura:** ports & adapters (`application` / `infra` / `modules`), repositórios TypeORM, soft delete, UUID na API
 - **Qualidade:** testes unitários e e2e (Jest), CI, migrations versionadas, OpenSpec para evolução spec-driven
@@ -77,13 +79,13 @@ pnpm run migration:revert
 
 | Tag | Base | Autenticação |
 |-----|------|----------------|
+| `todo-lists` | `/todo-lists` | JWT |
 | `sessions` | `POST /sessions` | Público (login) |
 | `users` | `/users` | JWT (exceto `POST /users`) |
 | `permissions` | `/permissions` | JWT |
 | `modules` | `/modules` | JWT |
 | `module-routes` | `/modules/:moduleId/routes` | JWT |
 | `permission-modules` | `/permissions/:permissionId/modules` | JWT |
-| `todo-lists` | `/todo-lists` | JWT |
 
 ### Paginação em listagens (breaking change)
 
