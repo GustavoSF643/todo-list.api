@@ -2,7 +2,7 @@ import { ConfigType, registerAs } from "@nestjs/config";
 
 export const appConfig = registerAs("appConfig", () => ({
   app: {
-    name: process.env.APP_NAME || "sit.cronos",
+    name: process.env.APP_NAME || "Permissions API — Auth, RBAC & Todo Lists",
     port: parseInt(process.env.PORT || "5000"),
     node_env: process.env.NODE_ENV || "development",
   },

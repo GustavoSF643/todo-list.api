@@ -1,6 +1,6 @@
 # Documentação
 
-Documentação técnica da `permissions.api`.
+Documentação técnica da **permissions.api** — API NestJS de autenticação JWT, autorização RBAC por módulos/rotas, gestão de usuários/permissões e domínio de todo-lists.
 
 ## Conteúdo
 

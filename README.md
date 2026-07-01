@@ -1,6 +1,15 @@
-# Permissions API
+# Permissions API — Auth, RBAC & Todo Lists
 
-API de permissões e autenticação construída com NestJS, organizada por camadas (`application`, `infra`, `modules`) e contextos de domínio.
+API REST em **NestJS** para autenticação JWT, autorização por módulos/rotas (RBAC), gestão de usuários e permissões, e domínio de **todo-lists** com visibilidade private/public. Projeto de portfólio com arquitetura em camadas, TypeORM, PostgreSQL, testes e documentação OpenAPI.
+
+## O que este projeto demonstra
+
+- **Autenticação:** login (`POST /sessions`), JWT, hash de senha (Scrypt), suporte a 2FA (TOTP via `otplib`)
+- **Autorização (RBAC):** permissões → módulos → rotas; `PermissionsGuard` valida `method + path` por usuário
+- **Domínio de negócio:** todo-lists e todo-items com owner, listas públicas/privadas e regras de leitura/escrita
+- **API design:** paginação padronizada (`{ data, meta }`), DTOs com `class-validator`, Swagger em `/api`
+- **Arquitetura:** ports & adapters (`application` / `infra` / `modules`), repositórios TypeORM, soft delete, UUID na API
+- **Qualidade:** testes unitários e e2e (Jest), CI, migrations versionadas, OpenSpec para evolução spec-driven
 
 ## Tecnologias
 

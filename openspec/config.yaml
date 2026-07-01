@@ -1,9 +1,11 @@
 schema: spec-driven
 
 context: |
-  Projeto: permissions.api — API NestJS de autenticação, permissões e domínios vinculados.
+  Projeto: permissions.api — API NestJS de autenticação JWT, autorização RBAC por módulos/rotas,
+  gestão de usuários/permissões e domínio de todo-lists (private/public) com itens aninhados.
 
-  Stack: NestJS 11, TypeORM, PostgreSQL, JWT, Swagger, pnpm, camadas application/infra/modules.
+  Stack: NestJS 11, TypeORM, PostgreSQL, JWT, Swagger, Redis (cache opcional), Zod, Jest, pnpm.
+  Camadas: application / infra / modules.
 
   Padrões existentes:
   - Contextos em src/application/<contexto> (dto, ports, services, mappers, tokens)
@@ -13,15 +15,12 @@ context: |
   - Soft delete (deleted_at), FKs por external_id
   - Autorização: JwtAuthGuard + PermissionsGuard (permission → module → route)
   - RouteSyncService registra rotas automaticamente no banco
+  - Paginação global em listagens: { data, meta } via common/pagination
 
-  Front consumidor: todo.permissions (Next.js) — ainda não implementado.
+  Front consumidor planejado: todo.permissions (Next.js) — ainda não implementado.
 
-  Próximo domínio: todo-lists
-  - Cada lista pertence a um user (owner)
-  - Lista pode ser privada (só owner) ou pública (outros users autenticados podem ler)
-  - Itens pertencem a uma lista
-  - Regras de escrita: apenas o owner altera lista e itens
-  - Leitura pública: qualquer user autenticado com permissão de módulo adequada
+  Domínios implementados: users, sessions, permissions, modules, module-routes,
+  permission-modules, todo-lists, todo-items.
 
   Desenvolvimento incremental via OpenSpec — backend antes do front.
 

@@ -1,6 +1,6 @@
 # Diagrama de arquitetura
 
-Visão geral da `permissions.api`.
+Visão geral da **permissions.api**: API REST com auth JWT, RBAC (permissão → módulo → rota), CRUD de usuários/permissões e todo-lists com regras de visibilidade.
 
 ## Fluxo HTTP
 
