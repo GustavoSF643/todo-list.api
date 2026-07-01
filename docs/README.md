@@ -27,6 +27,8 @@ Com a aplicação rodando:
 | `modules` | CRUD de módulos (blocos funcionais do front) |
 | `module-routes` | Vínculo entre módulo e rotas (`module_route`) |
 | `permission-modules` | Vínculo entre permissão e módulos (`permission_module`) |
+| `todo-lists` | CRUD de listas de tarefas por usuário (`is_public`) |
+| `todo-items` | CRUD de itens aninhados em listas |
 
 Cada contexto expõe DTOs, ports, services e tokens de injeção via `index.ts`.
 

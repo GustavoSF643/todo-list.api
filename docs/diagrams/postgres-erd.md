@@ -82,7 +82,35 @@ erDiagram
   route ||--o{ module_route : "route_id → external_id"
   permission ||--o{ permission_module : "permission_id → external_id"
   module ||--o{ permission_module : "module_id → external_id"
+
+  todo_list {
+    INT id PK
+    UUID external_id UK
+    UUID user_id FK
+    VARCHAR title
+    VARCHAR description
+    BOOLEAN is_public
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+    TIMESTAMP deleted_at
+  }
+
+  todo_item {
+    INT id PK
+    UUID external_id UK
+    UUID todo_list_id FK
+    VARCHAR title
+    BOOLEAN completed
+    INT position
+    TIMESTAMP created_at
+    TIMESTAMP updated_at
+    TIMESTAMP deleted_at
+  }
+
+  user ||--o{ todo_list : "user_id → external_id"
+  todo_list ||--o{ todo_item : "todo_list_id → external_id"
 ```
+
 
 ## Observações
 

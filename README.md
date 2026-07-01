@@ -74,6 +74,24 @@ pnpm run migration:revert
 | `modules` | `/modules` | JWT |
 | `module-routes` | `/modules/:moduleId/routes` | JWT |
 | `permission-modules` | `/permissions/:permissionId/modules` | JWT |
+| `todo-lists` | `/todo-lists` | JWT |
+
+### Módulos sugeridos (todo-lists)
+
+| module_key | Rotas |
+|------------|-------|
+| `TODO_LIST_READ` | `GET /todo-lists`, `GET /todo-lists/public`, `GET /todo-lists/:id` |
+| `TODO_LIST_WRITE` | `POST /todo-lists`, `PATCH /todo-lists/:id`, `DELETE /todo-lists/:id` |
+| `TODO_ITEM_READ` | `GET /todo-lists/:listId/items` |
+| `TODO_ITEM_WRITE` | `POST /todo-lists/:listId/items`, `PATCH /todo-lists/:listId/items/:itemId`, `DELETE /todo-lists/:listId/items/:itemId` |
+
+Vincule as rotas aos módulos via `PUT /modules/:moduleId/routes` e os módulos à permissão via `PUT /permissions/:permissionId/modules`.
+
+Regras de domínio (além do `PermissionsGuard`):
+
+- Cada lista pertence a um usuário (`user_id`).
+- `is_public: false` — só o owner lê/edita.
+- `is_public: true` — outros usuários autenticados podem **ler** lista e itens; apenas o owner **edita**.
 
 Fluxo sugerido:
 
@@ -94,6 +112,8 @@ src/
     sessions/            # login e emissão de token
     permissions/         # CRUD de permissões
     modules/             # CRUD de módulos
+    todo-lists/          # listas de tarefas por usuário
+    todo-items/          # itens de listas
     module-routes/       # vínculo módulo ↔ rotas
     permission-modules/  # vínculo permissão ↔ módulos
   config/                # env tipado (Zod + AppConfigService)
@@ -107,6 +127,7 @@ src/
     sessions/
     permissions/
     modules/
+    todo-lists/
   main.ts
 ```
 
